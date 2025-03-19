@@ -2,13 +2,12 @@
 
 ## Установка окружения
 
-Установить среду разработки [Visual Studio Code](https://code.visualstudio.com/download)\
+1. Установить среду разработки [Visual Studio Code](https://code.visualstudio.com/download)\
 Установить расшириения: ESLint, Prettier, Prisma, Docker
-
-Установить [NodeJs](https://nodejs.org/en/download)\
-Установить [Docker Desktop](https://www.docker.com/products/docker-desktop/)\
-Установить [Postman](https://www.postman.com/downloads/)\
-Установить [Git](https://git-scm.com/downloads)
+2. Установить [Git](https://git-scm.com/downloads)
+3. Установить [NodeJs](https://nodejs.org/en/download)
+4. Установить [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+5. Установить [Postman](https://www.postman.com/downloads/)
 
 ## Команды для работы с GIT
 
