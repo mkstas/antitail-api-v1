@@ -35,7 +35,7 @@ export default [
       sourceType: 'module',
 
       parserOptions: {
-        project: 'tsconfig.json',
+        // project: 'tsconfig.json',
         tsconfigRootDir: 'D:\\Programming\\nest-social-api',
       },
     },
