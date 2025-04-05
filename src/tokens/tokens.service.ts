@@ -59,4 +59,11 @@ export class TokensService {
     if (!previousToken) return await this.saveRefreshToken(refreshToken);
     return await this.updateRefreshToken(refreshToken);
   }
+
+  async deleteRefreshToken(refreshToken: string): Promise<void> {
+    const { sub: userId } = this.jwtService.decode<JwtPayload>(refreshToken);
+    await this.prismaService.token.delete({
+      where: { userId },
+    });
+  }
 }
