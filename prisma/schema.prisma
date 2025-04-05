@@ -12,3 +12,104 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  userId       Int        @id @default(autoincrement()) @map("user_id")
+  email        String     @unique
+  passwordHash String     @map("password_hash")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  Profile      Profile?
+  Token        Token?
+  Subject      Subject[]
+  Work         Work[]
+  WorkType     WorkType[]
+
+  @@map("users")
+}
+
+model Profile {
+  profileId Int      @id @default(autoincrement()) @map("profile_id")
+  user      User     @relation(fields: [userId], references: [userId])
+  userId    Int      @unique @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("profiles")
+}
+
+model Token {
+  tokenId      Int      @id @default(autoincrement()) @map("token_id")
+  user         User     @relation(fields: [userId], references: [userId])
+  userId       Int      @unique @map("user_id")
+  refreshToken String   @unique @map("refresh_token")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("tokens")
+}
+
+model Subject {
+  subjectId Int      @id @default(autoincrement()) @map("subject_id")
+  user      User     @relation(fields: [userId], references: [userId])
+  userId    Int      @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  Work      Work[]
+
+  @@map("subjects")
+}
+
+model Work {
+  workId       Int        @id @default(autoincrement()) @map("work_id")
+  user         User       @relation(fields: [userId], references: [userId])
+  userId       Int        @map("user_id")
+  subject      Subject    @relation(fields: [subjectId], references: [subjectId])
+  subjectId    Int        @map("subject_id")
+  workType     WorkType   @relation(fields: [workTypeId], references: [workTypeId])
+  workTypeId   Int        @map("work_type_id")
+  workStatus   WorkStatus @relation(fields: [workStatusId], references: [workStatusId])
+  workStatusId Int        @map("work_status_id")
+  title        String
+  description  String
+  deadline     DateTime
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  Subtask      Subtask[]
+
+  @@map("works")
+}
+
+model WorkType {
+  workTypeId Int      @id @default(autoincrement()) @map("work_type_id")
+  user       User     @relation(fields: [userId], references: [userId])
+  userId     Int      @map("user_id")
+  title      String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  Work       Work[]
+
+  @@map("work_types")
+}
+
+model WorkStatus {
+  workStatusId Int      @id @default(autoincrement()) @map("work_status_id")
+  title        String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  Work         Work[]
+
+  @@map("work_statuses")
+}
+
+model Subtask {
+  subtaskId   Int      @id @default(autoincrement()) @map("subtask_id")
+  work        Work     @relation(fields: [workId], references: [workId])
+  workId      Int      @map("work_id")
+  description String
+  isDone      Boolean  @default(false) @map("is_done")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("subtasks")
+}
