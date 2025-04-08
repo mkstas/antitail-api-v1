@@ -60,6 +60,11 @@ export class AuthController {
     this.setCookieWithToken(res, 'accessToken', accessToken, 60 * 10);
   }
 
+  @Get('check')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AccessTokenGuard)
+  async checkAuth(): Promise<void> {}
+
   private setCookieWithToken(res: Response, name: string, token: string, maxAge: number): void {
     res.cookie(name, token, { httpOnly: true, secure: true, maxAge: maxAge * 1000 });
   }
