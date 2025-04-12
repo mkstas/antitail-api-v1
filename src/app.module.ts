@@ -8,6 +8,7 @@ import { TokensModule } from './core/tokens/tokens.module';
 import { SubjectsModule } from './core/subjects/subjects.module';
 import { TaskTypesModule } from './core/task-types/task-types.module';
 import { TasksModule } from './core/tasks/tasks.module';
+import { SubtasksModule } from './core/subtasks/subtasks.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { TasksModule } from './core/tasks/tasks.module';
     SubjectsModule,
     TaskTypesModule,
     TasksModule,
+    SubtasksModule,
   ],
 })
 export class AppModule {}
