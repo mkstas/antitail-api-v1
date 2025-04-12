@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { UsersModule } from 'src/users/users.module';
-import { ProfilesModule } from 'src/profiles/profiles.module';
-import { TokensModule } from 'src/tokens/tokens.module';
+import { UsersModule } from 'src/core/users/users.module';
+import { ProfilesModule } from 'src/core/profiles/profiles.module';
+import { TokensModule } from 'src/core/tokens/tokens.module';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 import { AuthController } from './auth.controller';

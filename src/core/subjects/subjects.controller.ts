@@ -15,7 +15,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Subject } from '@prisma/client';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
-import { JwtPayload, JwtRequest } from 'src/tokens/tokens.types';
+import { JwtPayload, JwtRequest } from 'src/core/tokens/tokens.types';
 import { SubjectsService } from './subjects.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';

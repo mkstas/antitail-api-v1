@@ -1,10 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { ProfilesService } from 'src/profiles/profiles.service';
-import { UsersService } from 'src/users/users.service';
-import { TokensService } from 'src/tokens/tokens.service';
-import { JwtPayload, JwtTokens } from 'src/tokens/tokens.types';
+import { ProfilesService } from 'src/core/profiles/profiles.service';
+import { UsersService } from 'src/core/users/users.service';
+import { TokensService } from 'src/core/tokens/tokens.service';
+import { JwtPayload, JwtTokens } from 'src/core/tokens/tokens.types';
 import { AuthUserDto } from './dto/auth-user.dto';
 
 @Injectable()
@@ -18,9 +18,7 @@ export class AuthService {
 
   async register(dto: AuthUserDto): Promise<JwtTokens> {
     const user = await this.usersService.create(dto);
-    await this.profilesService.create({
-      userId: user.userId,
-    });
+    await this.profilesService.create(user.userId);
     const tokens = await this.tokensService.generateTokens({
       sub: user.userId,
       email: user.email,

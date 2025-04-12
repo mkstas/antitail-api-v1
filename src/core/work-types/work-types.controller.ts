@@ -15,7 +15,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { WorkType } from '@prisma/client';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
-import { JwtRequest, JwtPayload } from 'src/tokens/tokens.types';
+import { JwtRequest, JwtPayload } from 'src/core/tokens/tokens.types';
 import { WorkTypesService } from './work-types.service';
 import { CreateWorkTypeDto } from './dto/create-work-type.dto';
 import { UpdateWorkTypeDto } from './dto/update-work-type.dto';
