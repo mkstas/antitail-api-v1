@@ -7,6 +7,7 @@ import { ProfilesModule } from './core/profiles/profiles.module';
 import { TokensModule } from './core/tokens/tokens.module';
 import { SubjectsModule } from './core/subjects/subjects.module';
 import { WorkTypesModule } from './core/work-types/work-types.module';
+import { WorkStatusesModule } from './core/work-statuses/work-statuses.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { WorkTypesModule } from './core/work-types/work-types.module';
     TokensModule,
     SubjectsModule,
     WorkTypesModule,
+    WorkStatusesModule,
   ],
 })
 export class AppModule {}
