@@ -22,8 +22,8 @@ model User {
   Profile      Profile?
   Token        Token?
   Subject      Subject[]
-  Work         Work[]
-  WorkType     WorkType[]
+  TaskType     TaskType[]
+  Task         Task[]
 
   @@map("users")
 }
@@ -57,62 +57,50 @@ model Subject {
   isHidden  Boolean  @default(false) @map("is_hidden")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  Work      Work[]
+  Task      Task[]
 
   @@map("subjects")
 }
 
-model Work {
-  workId       Int        @id @default(autoincrement()) @map("work_id")
-  user         User       @relation(fields: [userId], references: [userId])
-  userId       Int        @map("user_id")
-  subject      Subject    @relation(fields: [subjectId], references: [subjectId])
-  subjectId    Int        @map("subject_id")
-  workType     WorkType   @relation(fields: [workTypeId], references: [workTypeId])
-  workTypeId   Int        @map("work_type_id")
-  workStatus   WorkStatus @relation(fields: [workStatusId], references: [workStatusId])
-  workStatusId Int        @map("work_status_id")
-  title        String
-  description  String
-  deadline     DateTime
-  isHidden     Boolean    @default(false) @map("is_hidden")
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
-  Subtask      Subtask[]
-
-  @@map("works")
-}
-
-model WorkType {
-  workTypeId Int      @id @default(autoincrement()) @map("work_type_id")
+model TaskType {
+  taskTypeId Int      @id @default(autoincrement()) @map("task_type_id")
   user       User     @relation(fields: [userId], references: [userId])
   userId     Int      @map("user_id")
   title      String
   isHidden   Boolean  @default(false) @map("is_hidden")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
-  Work       Work[]
+  Task       Task[]
 
-  @@map("work_types")
+  @@map("task_types")
 }
 
-model WorkStatus {
-  workStatusId Int      @id @default(autoincrement()) @map("work_status_id")
-  title        String
-  isHidden     Boolean  @default(false) @map("is_hidden")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-  Work         Work[]
+model Task {
+  taskId      Int       @id @default(autoincrement()) @map("task_id")
+  user        User      @relation(fields: [userId], references: [userId])
+  userId      Int       @map("user_id")
+  subject     Subject   @relation(fields: [subjectId], references: [subjectId])
+  subjectId   Int       @map("subject_id")
+  taskType    TaskType  @relation(fields: [taskTypeId], references: [taskTypeId])
+  taskTypeId  Int       @map("task_type_id")
+  title       String
+  description String
+  deadline    DateTime
+  isCompleted Boolean   @default(false) @map("is_completed")
+  isHidden    Boolean   @default(false) @map("is_hidden")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  Subtask     Subtask[]
 
-  @@map("work_statuses")
+  @@map("tasks")
 }
 
 model Subtask {
   subtaskId   Int      @id @default(autoincrement()) @map("subtask_id")
-  work        Work     @relation(fields: [workId], references: [workId])
-  workId      Int      @map("work_id")
+  task        Task     @relation(fields: [taskId], references: [taskId])
+  taskId      Int      @map("task_id")
   description String
-  isDone      Boolean  @default(false) @map("is_done")
+  isCompleted Boolean  @default(false) @map("is_completed")
   isHidden    Boolean  @default(false) @map("is_hidden")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
