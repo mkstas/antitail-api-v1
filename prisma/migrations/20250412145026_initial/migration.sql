@@ -34,6 +34,8 @@ CREATE TABLE "tokens" (
 CREATE TABLE "subjects" (
     "subject_id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
+    "title" TEXT NOT NULL,
+    "is_hidden" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -41,48 +43,41 @@ CREATE TABLE "subjects" (
 );
 
 -- CreateTable
-CREATE TABLE "works" (
-    "work_id" SERIAL NOT NULL,
+CREATE TABLE "task_types" (
+    "task_type_id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "title" TEXT NOT NULL,
+    "is_hidden" BOOLEAN NOT NULL DEFAULT false,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "task_types_pkey" PRIMARY KEY ("task_type_id")
+);
+
+-- CreateTable
+CREATE TABLE "tasks" (
+    "task_id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
     "subject_id" INTEGER NOT NULL,
-    "work_type_id" INTEGER NOT NULL,
-    "work_status_id" INTEGER NOT NULL,
+    "task_type_id" INTEGER NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "deadline" TIMESTAMP(3) NOT NULL,
+    "is_done" BOOLEAN NOT NULL DEFAULT false,
+    "is_hidden" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "works_pkey" PRIMARY KEY ("work_id")
-);
-
--- CreateTable
-CREATE TABLE "work_types" (
-    "work_type_id" SERIAL NOT NULL,
-    "user_id" INTEGER NOT NULL,
-    "title" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "work_types_pkey" PRIMARY KEY ("work_type_id")
-);
-
--- CreateTable
-CREATE TABLE "work_statuses" (
-    "work_status_id" SERIAL NOT NULL,
-    "title" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "work_statuses_pkey" PRIMARY KEY ("work_status_id")
+    CONSTRAINT "tasks_pkey" PRIMARY KEY ("task_id")
 );
 
 -- CreateTable
 CREATE TABLE "subtasks" (
     "subtask_id" SERIAL NOT NULL,
-    "work_id" INTEGER NOT NULL,
+    "task_id" INTEGER NOT NULL,
     "description" TEXT NOT NULL,
     "is_done" BOOLEAN NOT NULL DEFAULT false,
+    "is_hidden" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -111,19 +106,16 @@ ALTER TABLE "tokens" ADD CONSTRAINT "tokens_user_id_fkey" FOREIGN KEY ("user_id"
 ALTER TABLE "subjects" ADD CONSTRAINT "subjects_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "works" ADD CONSTRAINT "works_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "task_types" ADD CONSTRAINT "task_types_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "works" ADD CONSTRAINT "works_subject_id_fkey" FOREIGN KEY ("subject_id") REFERENCES "subjects"("subject_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "tasks" ADD CONSTRAINT "tasks_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "works" ADD CONSTRAINT "works_work_type_id_fkey" FOREIGN KEY ("work_type_id") REFERENCES "work_types"("work_type_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "tasks" ADD CONSTRAINT "tasks_subject_id_fkey" FOREIGN KEY ("subject_id") REFERENCES "subjects"("subject_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "works" ADD CONSTRAINT "works_work_status_id_fkey" FOREIGN KEY ("work_status_id") REFERENCES "work_statuses"("work_status_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "tasks" ADD CONSTRAINT "tasks_task_type_id_fkey" FOREIGN KEY ("task_type_id") REFERENCES "task_types"("task_type_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "work_types" ADD CONSTRAINT "work_types_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "subtasks" ADD CONSTRAINT "subtasks_work_id_fkey" FOREIGN KEY ("work_id") REFERENCES "works"("work_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "subtasks" ADD CONSTRAINT "subtasks_task_id_fkey" FOREIGN KEY ("task_id") REFERENCES "tasks"("task_id") ON DELETE RESTRICT ON UPDATE CASCADE;

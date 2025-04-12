@@ -19,7 +19,7 @@ export class SubjectsService {
     const subjects = await this.prismaService.subject.findMany({
       where: { userId },
     });
-    if (!subjects.length) throw new NotFoundException('Subjects is not found');
+    if (!subjects.length) throw new NotFoundException('Subjects are not found');
     return subjects;
   }
 

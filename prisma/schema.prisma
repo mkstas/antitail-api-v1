@@ -86,7 +86,7 @@ model Task {
   title       String
   description String
   deadline    DateTime
-  isCompleted Boolean   @default(false) @map("is_completed")
+  isDone      Boolean   @default(false) @map("is_done")
   isHidden    Boolean   @default(false) @map("is_hidden")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
@@ -100,7 +100,7 @@ model Subtask {
   task        Task     @relation(fields: [taskId], references: [taskId])
   taskId      Int      @map("task_id")
   description String
-  isCompleted Boolean  @default(false) @map("is_completed")
+  isDone      Boolean  @default(false) @map("is_done")
   isHidden    Boolean  @default(false) @map("is_hidden")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
