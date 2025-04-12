@@ -7,6 +7,7 @@ import { ProfilesModule } from './core/profiles/profiles.module';
 import { TokensModule } from './core/tokens/tokens.module';
 import { SubjectsModule } from './core/subjects/subjects.module';
 import { TaskTypesModule } from './core/task-types/task-types.module';
+import { TasksModule } from './core/tasks/tasks.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { TaskTypesModule } from './core/task-types/task-types.module';
     TokensModule,
     SubjectsModule,
     TaskTypesModule,
+    TasksModule,
   ],
 })
 export class AppModule {}
