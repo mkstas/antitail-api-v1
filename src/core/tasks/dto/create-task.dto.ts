@@ -4,10 +4,12 @@ import { IsDate, IsNumber, IsString, Min, MinLength } from 'class-validator';
 export class CreateTaskDto {
   @IsNumber()
   @Min(1)
+  @Type(() => Number)
   readonly subjectId: number;
 
   @IsNumber()
   @Min(1)
+  @Type(() => Number)
   readonly taskTypeId: number;
 
   @IsString()
