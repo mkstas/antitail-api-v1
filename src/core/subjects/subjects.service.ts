@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Subject } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
@@ -9,41 +9,86 @@ export class SubjectsService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(userId: number, dto: CreateSubjectDto): Promise<Subject> {
-    const subject = await this.prismaService.subject.create({
+    let subject = await this.prismaService.subject.findFirst({
+      where: { ...dto, isHidden: true },
+    });
+
+    if (subject) {
+      subject = await this.prismaService.subject.update({
+        where: { subjectId: subject.subjectId },
+        data: { isHidden: false },
+      });
+
+      return subject;
+    }
+
+    subject = await this.prismaService.subject.findFirst({
+      where: { ...dto, isHidden: false },
+    });
+
+    if (subject) {
+      throw new BadRequestException('Subject is already exists');
+    }
+
+    subject = await this.prismaService.subject.create({
       data: { userId, ...dto },
     });
+
     return subject;
   }
 
   async findAll(userId: number): Promise<Subject[]> {
     const subjects = await this.prismaService.subject.findMany({
-      where: { userId },
+      where: { userId, isHidden: false },
+      orderBy: { subjectId: 'asc' },
     });
-    if (!subjects.length) throw new NotFoundException('Subjects are not found');
+
+    if (!subjects.length) {
+      throw new NotFoundException('Subjects are not found');
+    }
+
     return subjects;
   }
 
   async update(userId: number, subjectId: number, dto: UpdateSubjectDto): Promise<Subject> {
-    const subject = await this.prismaService.subject.findUnique({
+    let subject = await this.prismaService.subject.findUnique({
       where: { subjectId, userId },
     });
-    if (!subject) throw new NotFoundException('Subject is not found');
-    const updatedSubject = await this.prismaService.subject.update({
+
+    if (!subject) {
+      throw new NotFoundException('Subject is not found');
+    }
+
+    subject = await this.prismaService.subject.findFirst({
+      where: { ...dto, isHidden: false },
+    });
+
+    if (subject) {
+      throw new BadRequestException('Subject is already exists');
+    }
+
+    subject = await this.prismaService.subject.update({
       where: { subjectId },
       data: { ...dto },
     });
-    return updatedSubject;
+
+    return subject;
   }
 
   async delete(userId: number, subjectId: number): Promise<Subject> {
     const subject = await this.prismaService.subject.findUnique({
-      where: { subjectId, userId },
+      where: { subjectId, userId, isHidden: false },
     });
-    if (!subject) throw new NotFoundException('Subject is not found');
+
+    if (!subject) {
+      throw new NotFoundException('Subject is not found');
+    }
+
     const updatedSubject = await this.prismaService.subject.update({
       where: { subjectId },
       data: { isHidden: true },
     });
+
     return updatedSubject;
   }
 }
