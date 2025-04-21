@@ -1,19 +1,23 @@
-import { IsOptional } from 'class-validator';
+import { IsBoolean, IsOptional } from 'class-validator';
 import { CreateTaskDto } from './create-task.dto';
 
 export class UpdateTaskDto extends CreateTaskDto {
   @IsOptional()
-  subjectId: number;
+  readonly subjectId: number;
 
   @IsOptional()
-  taskTypeId: number;
+  readonly taskTypeId: number;
 
   @IsOptional()
-  title: string;
+  readonly title: string;
 
   @IsOptional()
-  description: string;
+  readonly description: string;
 
   @IsOptional()
-  deadline: Date;
+  readonly deadline: Date;
+
+  @IsOptional()
+  @IsBoolean()
+  readonly isDone: boolean;
 }

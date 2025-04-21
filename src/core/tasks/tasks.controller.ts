@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -36,6 +37,23 @@ export class TasksController {
     return task;
   }
 
+  @Get()
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  async findAll(
+    @Query('subjectId') subjectId: string,
+    @Query('taskTypeId') taskTypeId: string,
+    @Req() req: JwtRequest,
+  ): Promise<Task[]> {
+    console.log(subjectId);
+    console.log(taskTypeId);
+    const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
+    const subjects = subjectId?.split(',');
+    const taskTypes = taskTypeId?.split(',');
+    const tasks = await this.tasksService.findAll(userId, subjects, taskTypes);
+    return tasks;
+  }
+
   @Get(':id')
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
@@ -43,15 +61,6 @@ export class TasksController {
     const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
     const task = await this.tasksService.find(userId, taskId);
     return task;
-  }
-
-  @Get()
-  @UseGuards(AccessTokenGuard)
-  @HttpCode(HttpStatus.OK)
-  async findAll(@Req() req: JwtRequest): Promise<Task[]> {
-    const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    const tasks = await this.tasksService.findAll(userId);
-    return tasks;
   }
 
   @Patch(':id')

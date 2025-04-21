@@ -10,7 +10,7 @@ export class TaskTypesService {
 
   async create(userId: number, dto: CreateTaskTypeDto): Promise<TaskType> {
     let taskType = await this.prismaService.taskType.findFirst({
-      where: { ...dto, isHidden: true },
+      where: { isHidden: true, ...dto },
     });
 
     if (taskType) {
@@ -23,7 +23,7 @@ export class TaskTypesService {
     }
 
     taskType = await this.prismaService.taskType.findFirst({
-      where: { ...dto, isHidden: false },
+      where: { isHidden: false, ...dto },
     });
 
     if (taskType) {
@@ -52,19 +52,32 @@ export class TaskTypesService {
 
   async update(userId: number, taskTypeId: number, dto: UpdateTaskTypeDto): Promise<TaskType> {
     let taskType = await this.prismaService.taskType.findUnique({
+      where: { userId, isHidden: true, ...dto },
+    });
+
+    if (taskType) {
+      taskType = await this.prismaService.taskType.update({
+        data: { isHidden: false },
+        where: { taskTypeId },
+      });
+
+      return taskType;
+    }
+
+    taskType = await this.prismaService.taskType.findUnique({
+      where: { userId, isHidden: false, ...dto },
+    });
+
+    if (taskType) {
+      throw new NotFoundException('Task type is already exists');
+    }
+
+    taskType = await this.prismaService.taskType.findUnique({
       where: { userId, taskTypeId },
     });
 
     if (!taskType) {
       throw new NotFoundException('Task type is not found');
-    }
-
-    taskType = await this.prismaService.taskType.findFirst({
-      where: { ...dto, isHidden: false },
-    });
-
-    if (taskType) {
-      throw new BadRequestException('Task type is already exists');
     }
 
     taskType = await this.prismaService.taskType.update({

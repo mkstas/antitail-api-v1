@@ -1,4 +1,4 @@
-import { IsOptional } from 'class-validator';
+import { IsBoolean, IsOptional } from 'class-validator';
 import { CreateSubtaskDto } from './create-subtask.dto';
 
 export class UpdateSubtaskDto extends CreateSubtaskDto {
@@ -7,4 +7,8 @@ export class UpdateSubtaskDto extends CreateSubtaskDto {
 
   @IsOptional()
   description: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isDone: boolean;
 }

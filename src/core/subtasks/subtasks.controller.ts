@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { Subtask } from '@prisma/client';
@@ -29,10 +30,10 @@ export class SubtasksController {
     return subtask;
   }
 
-  @Get(':id')
+  @Get()
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
-  async findAll(@Param('id', ParseIntPipe) taskId: number): Promise<Subtask[]> {
+  async findAll(@Query('taskId', ParseIntPipe) taskId: number): Promise<Subtask[]> {
     const subtasks = await this.subtasksService.findAll(taskId);
     return subtasks;
   }

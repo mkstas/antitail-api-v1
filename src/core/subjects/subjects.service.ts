@@ -9,8 +9,8 @@ export class SubjectsService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(userId: number, dto: CreateSubjectDto): Promise<Subject> {
-    let subject = await this.prismaService.subject.findFirst({
-      where: { ...dto, isHidden: true },
+    let subject = await this.prismaService.subject.findUnique({
+      where: { isHidden: true, ...dto },
     });
 
     if (subject) {
@@ -22,8 +22,8 @@ export class SubjectsService {
       return subject;
     }
 
-    subject = await this.prismaService.subject.findFirst({
-      where: { ...dto, isHidden: false },
+    subject = await this.prismaService.subject.findUnique({
+      where: { isHidden: false, ...dto },
     });
 
     if (subject) {
@@ -52,19 +52,32 @@ export class SubjectsService {
 
   async update(userId: number, subjectId: number, dto: UpdateSubjectDto): Promise<Subject> {
     let subject = await this.prismaService.subject.findUnique({
-      where: { subjectId, userId },
+      where: { userId, isHidden: true, ...dto },
+    });
+
+    if (subject) {
+      subject = await this.prismaService.subject.update({
+        data: { isHidden: false },
+        where: { subjectId },
+      });
+
+      return subject;
+    }
+
+    subject = await this.prismaService.subject.findUnique({
+      where: { userId, isHidden: false, ...dto },
+    });
+
+    if (subject) {
+      throw new NotFoundException('Subject is already exists');
+    }
+
+    subject = await this.prismaService.subject.findUnique({
+      where: { userId, subjectId },
     });
 
     if (!subject) {
       throw new NotFoundException('Subject is not found');
-    }
-
-    subject = await this.prismaService.subject.findFirst({
-      where: { ...dto, isHidden: false },
-    });
-
-    if (subject) {
-      throw new BadRequestException('Subject is already exists');
     }
 
     subject = await this.prismaService.subject.update({
