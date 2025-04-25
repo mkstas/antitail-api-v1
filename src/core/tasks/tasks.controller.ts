@@ -45,8 +45,6 @@ export class TasksController {
     @Query('taskTypeId') taskTypeId: string,
     @Req() req: JwtRequest,
   ): Promise<Task[]> {
-    console.log(subjectId);
-    console.log(taskTypeId);
     const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
     const subjects = subjectId?.split(',');
     const taskTypes = taskTypeId?.split(',');

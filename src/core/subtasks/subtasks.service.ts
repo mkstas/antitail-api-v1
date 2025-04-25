@@ -17,7 +17,7 @@ export class SubtasksService {
 
   async findAll(taskId: number): Promise<Subtask[]> {
     const subtasks = await this.prismaService.subtask.findMany({
-      where: { taskId },
+      where: { taskId, isHidden: false },
       orderBy: [{ isDone: 'asc' }, { createdAt: 'asc' }],
     });
     if (!subtasks.length) throw new NotFoundException('Subtasks are not found');

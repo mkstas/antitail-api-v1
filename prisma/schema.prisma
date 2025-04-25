@@ -53,7 +53,7 @@ model Subject {
   subjectId Int      @id @default(autoincrement()) @map("subject_id")
   user      User     @relation(fields: [userId], references: [userId])
   userId    Int      @map("user_id")
-  title     String   @unique
+  title     String
   isHidden  Boolean  @default(false) @map("is_hidden")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -66,7 +66,7 @@ model TaskType {
   taskTypeId Int      @id @default(autoincrement()) @map("task_type_id")
   user       User     @relation(fields: [userId], references: [userId])
   userId     Int      @map("user_id")
-  title      String   @unique
+  title      String
   isHidden   Boolean  @default(false) @map("is_hidden")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
@@ -83,7 +83,7 @@ model Task {
   subjectId   Int       @map("subject_id")
   taskType    TaskType  @relation(fields: [taskTypeId], references: [taskTypeId])
   taskTypeId  Int       @map("task_type_id")
-  title       String    @unique
+  title       String
   description String
   deadline    DateTime
   isDone      Boolean   @default(false) @map("is_done")

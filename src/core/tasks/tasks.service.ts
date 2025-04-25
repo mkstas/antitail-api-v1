@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Task } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -9,31 +9,9 @@ export class TasksService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(userId: number, dto: CreateTaskDto): Promise<Task> {
-    let task = await this.prismaService.task.findUnique({
-      where: { userId, title: dto.title, isHidden: true },
-    });
-
-    if (task) {
-      task = await this.prismaService.task.update({
-        where: { taskId: task.taskId },
-        data: { isHidden: false },
-      });
-
-      return task;
-    }
-
-    task = await this.prismaService.task.findUnique({
-      where: { userId, title: dto.title, isHidden: false },
-    });
-
-    if (task) {
-      throw new BadRequestException('Task is already exists');
-    }
-
-    task = await this.prismaService.task.create({
+    const task = await this.prismaService.task.create({
       data: { userId, ...dto },
     });
-
     return task;
   }
 
@@ -41,11 +19,9 @@ export class TasksService {
     const task = await this.prismaService.task.findUnique({
       where: { userId, taskId, isHidden: false },
     });
-
     if (!task) {
       throw new NotFoundException('Task is not found');
     }
-
     return task;
   }
 
@@ -62,7 +38,7 @@ export class TasksService {
           isHidden: false,
           AND: [{ OR: updatedSubjects }, { OR: updatedTaskTypes }],
         },
-        orderBy: [{ deadline: 'asc' }, { isDone: 'asc' }],
+        orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
       });
     } else if (updatedSubjects) {
       tasks = await this.prismaService.task.findMany({
@@ -71,7 +47,7 @@ export class TasksService {
           isHidden: false,
           OR: updatedSubjects,
         },
-        orderBy: [{ deadline: 'asc' }, { isDone: 'asc' }],
+        orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
       });
     } else if (updatedTaskTypes) {
       tasks = await this.prismaService.task.findMany({
@@ -80,12 +56,12 @@ export class TasksService {
           isHidden: false,
           OR: updatedTaskTypes,
         },
-        orderBy: [{ deadline: 'asc' }, { isDone: 'asc' }],
+        orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
       });
     } else {
       tasks = await this.prismaService.task.findMany({
         where: { userId, isHidden: false, OR: updatedSubjects },
-        orderBy: [{ deadline: 'asc' }, { isDone: 'asc' }],
+        orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
       });
     }
 
@@ -98,7 +74,7 @@ export class TasksService {
 
   async update(userId: number, taskId: number, dto: UpdateTaskDto): Promise<Task> {
     let task = await this.prismaService.task.findUnique({
-      where: { userId, title: dto.title, isHidden: true },
+      where: { userId, taskId, isHidden: true },
     });
 
     if (task) {
@@ -110,13 +86,13 @@ export class TasksService {
       return task;
     }
 
-    task = await this.prismaService.task.findUnique({
-      where: { userId, title: dto.title, isHidden: false },
-    });
+    // task = await this.prismaService.task.findUnique({
+    //   where: { userId, title: dto.title, isHidden: false },
+    // });
 
-    if (task) {
-      throw new NotFoundException('Task is already exists');
-    }
+    // if (task) {
+    //   throw new NotFoundException('Task is already exists');
+    // }
 
     task = await this.prismaService.task.findUnique({
       where: { userId, taskId },
@@ -136,18 +112,15 @@ export class TasksService {
 
   async delete(userId: number, taskId: number): Promise<Task> {
     const task = await this.prismaService.task.findUnique({
-      where: { userId, taskId, isHidden: true },
+      where: { userId, taskId, isHidden: false },
     });
-
     if (!task) {
       throw new NotFoundException('Task is not found');
     }
-
     const updatedTask = await this.prismaService.task.update({
       where: { taskId },
       data: { isHidden: true },
     });
-
     return updatedTask;
   }
 }
