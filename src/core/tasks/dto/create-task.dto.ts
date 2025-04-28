@@ -1,12 +1,14 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsNumber, IsString, Min, MinLength } from 'class-validator';
+import { IsDate, IsNumber, IsOptional, IsString, Min, MinLength } from 'class-validator';
 
 export class CreateTaskDto {
+  @IsOptional()
   @IsNumber()
   @Min(1)
   @Type(() => Number)
   readonly subjectId: number;
 
+  @IsOptional()
   @IsNumber()
   @Min(1)
   @Type(() => Number)

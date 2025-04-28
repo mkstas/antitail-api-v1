@@ -1,7 +1,7 @@
 import { MinLength, IsString } from 'class-validator';
 
 export class CreateSubjectDto {
-  @MinLength(1)
   @IsString()
+  @MinLength(1)
   readonly title: string;
 }

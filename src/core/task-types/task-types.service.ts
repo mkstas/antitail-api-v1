@@ -17,34 +17,39 @@ export class TaskTypesService {
 
   async findAll(userId: number): Promise<TaskType[]> {
     const taskTypes = await this.prismaService.taskType.findMany({
-      where: { userId, isHidden: false },
+      where: { userId },
       orderBy: { taskTypeId: 'asc' },
     });
-    if (!taskTypes.length) throw new NotFoundException('Task types are not found');
+    if (!taskTypes.length) {
+      throw new NotFoundException('Task types are not found');
+    }
     return taskTypes;
   }
 
   async update(userId: number, taskTypeId: number, dto: UpdateTaskTypeDto): Promise<TaskType> {
-    const taskType = await this.prismaService.taskType.findUnique({
+    let taskType = await this.prismaService.taskType.findFirst({
       where: { userId, taskTypeId },
     });
-    if (!taskType) throw new NotFoundException('Task type is not found');
-    const updatedTaskType = await this.prismaService.taskType.update({
+    if (!taskType) {
+      throw new NotFoundException('Task type is not found');
+    }
+    taskType = await this.prismaService.taskType.update({
       where: { taskTypeId },
       data: { ...dto },
     });
-    return updatedTaskType;
+    return taskType;
   }
 
   async delete(userId: number, taskTypeId: number): Promise<TaskType> {
-    const taskType = await this.prismaService.taskType.findUnique({
+    let taskType = await this.prismaService.taskType.findFirst({
       where: { userId, taskTypeId },
     });
-    if (!taskType) throw new NotFoundException('Task type is not found');
-    const updatedTaskType = await this.prismaService.taskType.update({
+    if (!taskType) {
+      throw new NotFoundException('Task type is not found');
+    }
+    taskType = await this.prismaService.taskType.delete({
       where: { taskTypeId },
-      data: { isHidden: true },
     });
-    return updatedTaskType;
+    return taskType;
   }
 }

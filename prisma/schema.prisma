@@ -19,23 +19,12 @@ model User {
   passwordHash String     @map("password_hash")
   createdAt    DateTime   @default(now()) @map("created_at")
   updatedAt    DateTime   @updatedAt @map("updated_at")
-  Profile      Profile?
   Token        Token?
   Subject      Subject[]
   TaskType     TaskType[]
   Task         Task[]
 
   @@map("users")
-}
-
-model Profile {
-  profileId Int      @id @default(autoincrement()) @map("profile_id")
-  user      User     @relation(fields: [userId], references: [userId])
-  userId    Int      @unique @map("user_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("profiles")
 }
 
 model Token {
@@ -54,7 +43,6 @@ model Subject {
   user      User     @relation(fields: [userId], references: [userId])
   userId    Int      @map("user_id")
   title     String
-  isHidden  Boolean  @default(false) @map("is_hidden")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   Task      Task[]
@@ -67,7 +55,6 @@ model TaskType {
   user       User     @relation(fields: [userId], references: [userId])
   userId     Int      @map("user_id")
   title      String
-  isHidden   Boolean  @default(false) @map("is_hidden")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
   Task       Task[]
@@ -79,15 +66,14 @@ model Task {
   taskId      Int       @id @default(autoincrement()) @map("task_id")
   user        User      @relation(fields: [userId], references: [userId])
   userId      Int       @map("user_id")
-  subject     Subject   @relation(fields: [subjectId], references: [subjectId])
-  subjectId   Int       @map("subject_id")
-  taskType    TaskType  @relation(fields: [taskTypeId], references: [taskTypeId])
-  taskTypeId  Int       @map("task_type_id")
+  subject     Subject?  @relation(fields: [subjectId], references: [subjectId], onDelete: SetNull)
+  subjectId   Int?      @map("subject_id")
+  taskType    TaskType? @relation(fields: [taskTypeId], references: [taskTypeId], onDelete: SetNull)
+  taskTypeId  Int?      @map("task_type_id")
   title       String
   description String
   deadline    DateTime
   isDone      Boolean   @default(false) @map("is_done")
-  isHidden    Boolean   @default(false) @map("is_hidden")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
   Subtask     Subtask[]
@@ -101,7 +87,6 @@ model Subtask {
   taskId      Int      @map("task_id")
   description String
   isDone      Boolean  @default(false) @map("is_done")
-  isHidden    Boolean  @default(false) @map("is_hidden")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 

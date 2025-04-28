@@ -17,34 +17,39 @@ export class SubtasksService {
 
   async findAll(taskId: number): Promise<Subtask[]> {
     const subtasks = await this.prismaService.subtask.findMany({
-      where: { taskId, isHidden: false },
+      where: { taskId },
       orderBy: [{ isDone: 'asc' }, { createdAt: 'asc' }],
     });
-    if (!subtasks.length) throw new NotFoundException('Subtasks are not found');
+    if (!subtasks.length) {
+      throw new NotFoundException('Subtasks are not found');
+    }
     return subtasks;
   }
 
   async update(subtaskId: number, dto: UpdateSubtaskDto): Promise<Subtask> {
-    const subtask = await this.prismaService.subtask.findUnique({
+    let subtask = await this.prismaService.subtask.findUnique({
       where: { subtaskId },
     });
-    if (!subtask) throw new NotFoundException('Subtask is not found');
-    const updatedSubtask = await this.prismaService.subtask.update({
+    if (!subtask) {
+      throw new NotFoundException('Subtask is not found');
+    }
+    subtask = await this.prismaService.subtask.update({
       where: { subtaskId },
       data: { ...dto },
     });
-    return updatedSubtask;
+    return subtask;
   }
 
   async delete(subtaskId: number): Promise<Subtask> {
-    const subtask = await this.prismaService.subtask.findUnique({
+    let subtask = await this.prismaService.subtask.findUnique({
       where: { subtaskId },
     });
-    if (!subtask) throw new NotFoundException('Subtask is not found');
-    const updatedSubtask = await this.prismaService.subtask.update({
+    if (!subtask) {
+      throw new NotFoundException('Subtask is not found');
+    }
+    subtask = await this.prismaService.subtask.delete({
       where: { subtaskId },
-      data: { isHidden: true },
     });
-    return updatedSubtask;
+    return subtask;
   }
 }

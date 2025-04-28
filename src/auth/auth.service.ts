@@ -1,7 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { ProfilesService } from 'src/core/profiles/profiles.service';
 import { UsersService } from 'src/core/users/users.service';
 import { TokensService } from 'src/core/tokens/tokens.service';
 import { JwtPayload, JwtTokens } from 'src/core/tokens/tokens.types';
@@ -12,13 +11,11 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
-    private readonly profilesService: ProfilesService,
     private readonly tokensService: TokensService,
   ) {}
 
   async register(dto: AuthUserDto): Promise<JwtTokens> {
     const user = await this.usersService.create(dto);
-    await this.profilesService.create(user.userId);
     const tokens = await this.tokensService.generateTokens({
       sub: user.userId,
       email: user.email,

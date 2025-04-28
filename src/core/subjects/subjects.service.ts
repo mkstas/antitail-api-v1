@@ -17,34 +17,39 @@ export class SubjectsService {
 
   async findAll(userId: number): Promise<Subject[]> {
     const subjects = await this.prismaService.subject.findMany({
-      where: { userId, isHidden: false },
+      where: { userId },
       orderBy: { subjectId: 'asc' },
     });
-    if (!subjects.length) throw new NotFoundException('Subjects are not found');
+    if (!subjects.length) {
+      throw new NotFoundException('Subjects are not found');
+    }
     return subjects;
   }
 
   async update(userId: number, subjectId: number, dto: UpdateSubjectDto): Promise<Subject> {
-    const subject = await this.prismaService.subject.findFirst({
-      where: { userId, isHidden: false, ...dto },
+    let subject = await this.prismaService.subject.findFirst({
+      where: { userId, subjectId },
     });
-    if (!subject) throw new NotFoundException('Subject is not found');
-    const updatedSubject = await this.prismaService.subject.update({
+    if (!subject) {
+      throw new NotFoundException('Subject is not found');
+    }
+    subject = await this.prismaService.subject.update({
       where: { subjectId },
       data: { ...dto },
     });
-    return updatedSubject;
+    return subject;
   }
 
   async delete(userId: number, subjectId: number): Promise<Subject> {
-    const subject = await this.prismaService.subject.findFirst({
-      where: { subjectId, userId, isHidden: false },
+    let subject = await this.prismaService.subject.findFirst({
+      where: { userId, subjectId },
     });
-    if (!subject) throw new NotFoundException('Subject is not found');
-    const updatedSubject = await this.prismaService.subject.update({
+    if (!subject) {
+      throw new NotFoundException('Subject is not found');
+    }
+    subject = await this.prismaService.subject.delete({
       where: { subjectId },
-      data: { isHidden: true },
     });
-    return updatedSubject;
+    return subject;
   }
 }

@@ -16,10 +16,12 @@ export class TasksService {
   }
 
   async find(userId: number, taskId: number): Promise<Task> {
-    const task = await this.prismaService.task.findUnique({
-      where: { userId, taskId, isHidden: false },
+    const task = await this.prismaService.task.findFirst({
+      where: { userId, taskId },
     });
-    if (!task) throw new NotFoundException('Task is not found');
+    if (!task) {
+      throw new NotFoundException('Task is not found');
+    }
     return task;
   }
 
@@ -32,7 +34,6 @@ export class TasksService {
       tasks = await this.prismaService.task.findMany({
         where: {
           userId,
-          isHidden: false,
           AND: [{ OR: updatedSubjects }, { OR: updatedTaskTypes }],
         },
         orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
@@ -41,7 +42,6 @@ export class TasksService {
       tasks = await this.prismaService.task.findMany({
         where: {
           userId,
-          isHidden: false,
           OR: updatedSubjects,
         },
         orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
@@ -50,43 +50,47 @@ export class TasksService {
       tasks = await this.prismaService.task.findMany({
         where: {
           userId,
-          isHidden: false,
           OR: updatedTaskTypes,
         },
         orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
       });
     } else {
       tasks = await this.prismaService.task.findMany({
-        where: { userId, isHidden: false, OR: updatedSubjects },
+        where: { userId, OR: updatedSubjects },
         orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
       });
     }
 
-    if (!tasks.length) throw new NotFoundException('Tasks are not found');
+    if (!tasks.length) {
+      throw new NotFoundException('Tasks are not found');
+    }
     return tasks;
   }
 
   async update(userId: number, taskId: number, dto: UpdateTaskDto): Promise<Task> {
-    const task = await this.prismaService.task.findUnique({
+    let task = await this.prismaService.task.findUnique({
       where: { userId, taskId },
     });
-    if (!task) throw new NotFoundException('Task is not found');
-    const updatedTask = await this.prismaService.task.update({
+    if (!task) {
+      throw new NotFoundException('Task is not found');
+    }
+    task = await this.prismaService.task.update({
       where: { taskId },
       data: { ...dto },
     });
-    return updatedTask;
+    return task;
   }
 
   async delete(userId: number, taskId: number): Promise<Task> {
-    const task = await this.prismaService.task.findUnique({
-      where: { userId, taskId, isHidden: false },
+    let task = await this.prismaService.task.findUnique({
+      where: { userId, taskId },
     });
-    if (!task) throw new NotFoundException('Task is not found');
-    const updatedTask = await this.prismaService.task.update({
+    if (!task) {
+      throw new NotFoundException('Task is not found');
+    }
+    task = await this.prismaService.task.delete({
       where: { taskId },
-      data: { isHidden: true },
     });
-    return updatedTask;
+    return task;
   }
 }
