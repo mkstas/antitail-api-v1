@@ -23,9 +23,10 @@ services:
       - PG_DATA=/var/lib/postgresql/data
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./prisma\migrations\20250428092258_initial\migration.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - 5432:5432
+      - 5433:5433
+    command: -p 5433
 
 volumes:
   pgdata:
