@@ -17,12 +17,13 @@ services:
     container_name: postgres
     image: postgres:alpine
     environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=nest-antitail
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
       - PG_DATA=/var/lib/postgresql/data
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./prisma\migrations\20250428092258_initial\migration.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - 5432:5432
 
