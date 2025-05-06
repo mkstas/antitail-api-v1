@@ -13,50 +13,50 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Subject } from '@prisma/client';
-import { SubjectsService } from './subjects.service';
+import { Type } from '@prisma/client';
 import { JwtRequest, JwtPayload } from 'src/auth/auth.types';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
-import { CreateSubjectDto } from './dto/create-subject.dto';
-import { UpdateSubjectDto } from './dto/update-subject.dto';
+import { CreateTypeDto } from './dto/create-type.dto';
+import { UpdateTypeDto } from './dto/update-type.dto';
+import { TypesService } from './types.service';
 
-@Controller('subjects')
-export class SubjectsController {
+@Controller('types')
+export class TypesController {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly subjectsService: SubjectsService,
+    private readonly typesService: TypesService,
   ) {}
 
   @Post()
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.CREATED)
-  async create(@Req() req: JwtRequest, @Body() dto: CreateSubjectDto): Promise<Subject> {
+  async create(@Req() req: JwtRequest, @Body() dto: CreateTypeDto): Promise<Type> {
     const { sub: phoneId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    return await this.subjectsService.create(phoneId, dto);
+    return await this.typesService.create(phoneId, dto);
   }
 
   @Get()
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
-  async findAll(@Req() req: JwtRequest): Promise<Subject[]> {
+  async findAll(@Req() req: JwtRequest): Promise<Type[]> {
     const { sub: phoneId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    return await this.subjectsService.findAll(phoneId);
+    return await this.typesService.findAll(phoneId);
   }
 
   @Patch(':id')
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
   async update(
-    @Param('id', ParseIntPipe) subjectId: number,
-    @Body() dto: UpdateSubjectDto,
-  ): Promise<Subject> {
-    return await this.subjectsService.update(subjectId, dto);
+    @Param('id', ParseIntPipe) typeId: number,
+    @Body() dto: UpdateTypeDto,
+  ): Promise<Type> {
+    return await this.typesService.update(typeId, dto);
   }
 
   @Delete(':id')
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
-  async delete(@Param('id', ParseIntPipe) subjectId: number): Promise<Subject> {
-    return await this.subjectsService.delete(subjectId);
+  async delete(@Param('id', ParseIntPipe) typeId: number): Promise<Type> {
+    return await this.typesService.delete(typeId);
   }
 }

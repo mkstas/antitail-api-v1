@@ -8,16 +8,15 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 export class TasksService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(userId: number, dto: CreateTaskDto): Promise<Task> {
-    const task = await this.prismaService.task.create({
-      data: { userId, ...dto },
+  async create(phoneId: number, dto: CreateTaskDto): Promise<Task> {
+    return await this.prismaService.task.create({
+      data: { phoneId, ...dto },
     });
-    return task;
   }
 
-  async find(userId: number, taskId: number): Promise<Task> {
+  async find(taskId: number): Promise<Task> {
     const task = await this.prismaService.task.findFirst({
-      where: { userId, taskId },
+      where: { taskId },
     });
     if (!task) {
       throw new NotFoundException('Task is not found');
@@ -25,38 +24,38 @@ export class TasksService {
     return task;
   }
 
-  async findAll(userId: number, subjects: string[], taskTypes: string[]): Promise<Task[]> {
+  async findAll(phoneId: number, subjects: string[], taskTypes: string[]): Promise<Task[]> {
     const updatedSubjects = subjects?.map(id => ({ subjectId: Number(id) }));
-    const updatedTaskTypes = taskTypes?.map(id => ({ taskTypeId: Number(id) }));
+    const updatedTypes = taskTypes?.map(id => ({ typeId: Number(id) }));
     let tasks: Task[] = [];
 
-    if (updatedSubjects && updatedTaskTypes) {
+    if (updatedSubjects && updatedTypes) {
       tasks = await this.prismaService.task.findMany({
         where: {
-          userId,
-          AND: [{ OR: updatedSubjects }, { OR: updatedTaskTypes }],
+          phoneId,
+          AND: [{ OR: updatedSubjects }, { OR: updatedTypes }],
         },
         orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
       });
     } else if (updatedSubjects) {
       tasks = await this.prismaService.task.findMany({
         where: {
-          userId,
+          phoneId,
           OR: updatedSubjects,
         },
         orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
       });
-    } else if (updatedTaskTypes) {
+    } else if (updatedTypes) {
       tasks = await this.prismaService.task.findMany({
         where: {
-          userId,
-          OR: updatedTaskTypes,
+          phoneId,
+          OR: updatedTypes,
         },
         orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
       });
     } else {
       tasks = await this.prismaService.task.findMany({
-        where: { userId, OR: updatedSubjects },
+        where: { phoneId, OR: updatedSubjects },
         orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
       });
     }
@@ -67,30 +66,18 @@ export class TasksService {
     return tasks;
   }
 
-  async update(userId: number, taskId: number, dto: UpdateTaskDto): Promise<Task> {
-    let task = await this.prismaService.task.findUnique({
-      where: { userId, taskId },
-    });
-    if (!task) {
-      throw new NotFoundException('Task is not found');
-    }
-    task = await this.prismaService.task.update({
+  async update(taskId: number, dto: UpdateTaskDto): Promise<Task> {
+    await this.find(taskId);
+    return await this.prismaService.task.update({
       where: { taskId },
       data: { ...dto },
     });
-    return task;
   }
 
-  async delete(userId: number, taskId: number): Promise<Task> {
-    let task = await this.prismaService.task.findUnique({
-      where: { userId, taskId },
-    });
-    if (!task) {
-      throw new NotFoundException('Task is not found');
-    }
-    task = await this.prismaService.task.delete({
+  async delete(taskId: number): Promise<Task> {
+    await this.find(taskId);
+    return await this.prismaService.task.delete({
       where: { taskId },
     });
-    return task;
   }
 }

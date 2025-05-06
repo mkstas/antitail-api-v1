@@ -1,13 +1,11 @@
-export interface JwtTokens {
+export interface JwtToken {
   accessToken: string;
-  refreshToken: string;
 }
 
 export interface JwtRequest extends Request {
-  cookies: JwtTokens;
+  cookies: JwtToken;
 }
 
 export interface JwtPayload {
   sub: number;
-  email: string;
 }

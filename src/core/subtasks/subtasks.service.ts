@@ -9,10 +9,9 @@ export class SubtasksService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(dto: CreateSubtaskDto): Promise<Subtask> {
-    const subtask = await this.prismaService.subtask.create({
-      data: { ...dto },
+    return await this.prismaService.subtask.create({
+      data: dto,
     });
-    return subtask;
   }
 
   async findAll(taskId: number): Promise<Subtask[]> {
@@ -26,30 +25,28 @@ export class SubtasksService {
     return subtasks;
   }
 
-  async update(subtaskId: number, dto: UpdateSubtaskDto): Promise<Subtask> {
-    let subtask = await this.prismaService.subtask.findUnique({
+  async find(subtaskId: number): Promise<Subtask> {
+    const subtask = await this.prismaService.subtask.findUnique({
       where: { subtaskId },
     });
     if (!subtask) {
       throw new NotFoundException('Subtask is not found');
     }
-    subtask = await this.prismaService.subtask.update({
-      where: { subtaskId },
-      data: { ...dto },
-    });
     return subtask;
   }
 
+  async update(subtaskId: number, dto: UpdateSubtaskDto): Promise<Subtask> {
+    await this.find(subtaskId);
+    return await this.prismaService.subtask.update({
+      where: { subtaskId },
+      data: { ...dto },
+    });
+  }
+
   async delete(subtaskId: number): Promise<Subtask> {
-    let subtask = await this.prismaService.subtask.findUnique({
+    await this.find(subtaskId);
+    return await this.prismaService.subtask.delete({
       where: { subtaskId },
     });
-    if (!subtask) {
-      throw new NotFoundException('Subtask is not found');
-    }
-    subtask = await this.prismaService.subtask.delete({
-      where: { subtaskId },
-    });
-    return subtask;
   }
 }

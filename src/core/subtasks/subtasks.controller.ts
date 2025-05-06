@@ -26,16 +26,14 @@ export class SubtasksController {
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateSubtaskDto): Promise<Subtask> {
-    const subtask = await this.subtasksService.create(dto);
-    return subtask;
+    return await this.subtasksService.create(dto);
   }
 
   @Get()
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
   async findAll(@Query('taskId', ParseIntPipe) taskId: number): Promise<Subtask[]> {
-    const subtasks = await this.subtasksService.findAll(taskId);
-    return subtasks;
+    return await this.subtasksService.findAll(taskId);
   }
 
   @Patch(':id')
@@ -45,15 +43,13 @@ export class SubtasksController {
     @Param('id', ParseIntPipe) subtaskId: number,
     @Body() dto: UpdateSubtaskDto,
   ): Promise<Subtask> {
-    const subtask = await this.subtasksService.update(subtaskId, dto);
-    return subtask;
+    return await this.subtasksService.update(subtaskId, dto);
   }
 
   @Delete(':id')
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
   async delete(@Param('id', ParseIntPipe) subtaskId: number): Promise<Subtask> {
-    const subtask = await this.subtasksService.delete(subtaskId);
-    return subtask;
+    return await this.subtasksService.delete(subtaskId);
   }
 }
