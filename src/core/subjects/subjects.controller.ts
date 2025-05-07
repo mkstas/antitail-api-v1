@@ -35,6 +35,13 @@ export class SubjectsController {
     return await this.subjectsService.create(phoneId, dto);
   }
 
+  @Get(':id')
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  async find(@Param('id', ParseIntPipe) subjectId: number): Promise<Subject> {
+    return await this.subjectsService.find(subjectId);
+  }
+
   @Get()
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)

@@ -8,42 +8,42 @@ import { UpdateTypeDto } from './dto/update-type.dto';
 export class TypesService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(phoneId: number, dto: CreateTypeDto): Promise<Type> {
+  async create(dto: CreateTypeDto): Promise<Type> {
     return await this.prismaService.type.create({
-      data: { phoneId, ...dto },
+      data: { ...dto },
     });
   }
 
-  async find(typeId: number): Promise<Type> {
-    const subject = await this.prismaService.type.findUnique({
-      where: { typeId },
+  async findAll(subjectId: number): Promise<Type[]> {
+    const types = await this.prismaService.type.findMany({
+      where: { subjectId },
     });
-    if (!subject) {
-      throw new NotFoundException('Type is not found');
-    }
-    return subject;
-  }
-
-  async findAll(phoneId: number): Promise<Type[]> {
-    const subjects = await this.prismaService.type.findMany({
-      where: { phoneId },
-    });
-    if (!subjects.length) {
+    if (!types.length) {
       throw new NotFoundException('Types are not found');
     }
-    return subjects;
+    return types;
   }
 
   async update(typeId: number, dto: UpdateTypeDto): Promise<Type> {
-    await this.find(typeId);
+    const type = await this.prismaService.type.findFirst({
+      where: { typeId },
+    });
+    if (!type) {
+      throw new NotFoundException('Type is not found');
+    }
     return await this.prismaService.type.update({
       where: { typeId },
-      data: dto,
+      data: { ...dto },
     });
   }
 
   async delete(typeId: number): Promise<Type> {
-    await this.find(typeId);
+    const type = await this.prismaService.type.findFirst({
+      where: { typeId },
+    });
+    if (!type) {
+      throw new NotFoundException('Type is not found');
+    }
     return await this.prismaService.type.delete({
       where: { typeId },
     });

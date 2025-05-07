@@ -35,7 +35,12 @@ export class SubjectsService {
   }
 
   async update(subjectId: number, dto: UpdateSubjectDto): Promise<Subject> {
-    await this.find(subjectId);
+    const subject = await this.prismaService.subject.findFirst({
+      where: { subjectId },
+    });
+    if (!subject) {
+      throw new NotFoundException('Subject is not found');
+    }
     return await this.prismaService.subject.update({
       where: { subjectId },
       data: dto,
@@ -43,7 +48,12 @@ export class SubjectsService {
   }
 
   async delete(subjectId: number): Promise<Subject> {
-    await this.find(subjectId);
+    const subject = await this.prismaService.subject.findFirst({
+      where: { subjectId },
+    });
+    if (!subject) {
+      throw new NotFoundException('Subject is not found');
+    }
     return await this.prismaService.subject.delete({
       where: { subjectId },
     });
