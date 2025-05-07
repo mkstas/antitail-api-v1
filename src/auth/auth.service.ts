@@ -19,7 +19,7 @@ export class AuthService {
         data: { phone: dto.phone },
       });
     }
-    return String(this.generateAccessToken(candidate.phoneId));
+    return String(await this.generateAccessToken(candidate.phoneId));
   }
 
   private async generateAccessToken(sub: number): Promise<string> {
