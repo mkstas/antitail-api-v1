@@ -9,7 +9,7 @@ services:
       - /app/node_modules
     ports:
       - 3000:3000
-    command: npm run start
+    command: npm run start:migrate
     depends_on:
       - postgres
 
@@ -23,7 +23,6 @@ services:
       - PG_DATA=/var/lib/postgresql/data
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - 5433:5433
     command: -p 5433

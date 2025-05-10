@@ -12,10 +12,10 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { Subtask } from '@prisma/client';
-import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { SubtasksService } from './subtasks.service';
+import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { CreateSubtaskDto } from './dto/create-subtask.dto';
+import { Subtask } from '@prisma/client';
 import { UpdateSubtaskDto } from './dto/update-subtask.dto';
 
 @Controller('subtasks')
@@ -24,18 +24,16 @@ export class SubtasksController {
 
   @Post()
   @UseGuards(AccessTokenGuard)
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.OK)
   async create(@Body() dto: CreateSubtaskDto): Promise<Subtask> {
-    const subtask = await this.subtasksService.create(dto);
-    return subtask;
+    return await this.subtasksService.create(dto);
   }
 
   @Get()
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
   async findAll(@Query('taskId', ParseIntPipe) taskId: number): Promise<Subtask[]> {
-    const subtasks = await this.subtasksService.findAll(taskId);
-    return subtasks;
+    return await this.subtasksService.findAll(taskId);
   }
 
   @Patch(':id')
@@ -45,15 +43,13 @@ export class SubtasksController {
     @Param('id', ParseIntPipe) subtaskId: number,
     @Body() dto: UpdateSubtaskDto,
   ): Promise<Subtask> {
-    const subtask = await this.subtasksService.update(subtaskId, dto);
-    return subtask;
+    return await this.subtasksService.update(subtaskId, dto);
   }
 
   @Delete(':id')
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
   async delete(@Param('id', ParseIntPipe) subtaskId: number): Promise<Subtask> {
-    const subtask = await this.subtasksService.delete(subtaskId);
-    return subtask;
+    return await this.subtasksService.delete(subtaskId);
   }
 }

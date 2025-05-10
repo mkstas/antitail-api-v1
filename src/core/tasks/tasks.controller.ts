@@ -13,11 +13,11 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Task } from '@prisma/client';
-import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
-import { JwtRequest, JwtPayload } from 'src/core/tokens/tokens.types';
+import { JwtService } from '@nestjs/jwt';
 import { TasksService } from './tasks.service';
+import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
+import { JwtPayload, JwtRequest } from 'src/auth/auth.types';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 
@@ -31,55 +31,53 @@ export class TasksController {
   @Post()
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.CREATED)
-  async create(@Req() req: JwtRequest, @Body() dto: CreateTaskDto): Promise<Task> {
-    const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    const task = await this.tasksService.create(userId, dto);
-    return task;
+  async create(@Body() dto: CreateTaskDto): Promise<Task> {
+    return await this.tasksService.create(dto);
   }
 
   @Get()
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
   async findAll(
+    @Req() req: JwtRequest,
     @Query('subjectId') subjectId: string,
     @Query('taskTypeId') taskTypeId: string,
-    @Req() req: JwtRequest,
   ): Promise<Task[]> {
-    const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
+    const { sub: phoneId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
     const subjects = subjectId?.split(',');
     const taskTypes = taskTypeId?.split(',');
-    const tasks = await this.tasksService.findAll(userId, subjects, taskTypes);
-    return tasks;
+    return await this.tasksService.findAll(phoneId, subjects, taskTypes);
+  }
+
+  @Get('notifications')
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  async findNotifications(@Req() req: JwtRequest) {
+    const { sub: phoneId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
+    return await this.tasksService.findNotifications(phoneId);
   }
 
   @Get(':id')
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
-  async find(@Req() req: JwtRequest, @Param('id', ParseIntPipe) taskId: number): Promise<Task> {
-    const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    const task = await this.tasksService.find(userId, taskId);
-    return task;
+  async find(@Param('id', ParseIntPipe) taskId: number): Promise<Task> {
+    return await this.tasksService.find(taskId);
   }
 
   @Patch(':id')
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
   async update(
-    @Req() req: JwtRequest,
     @Param('id', ParseIntPipe) taskId: number,
     @Body() dto: UpdateTaskDto,
   ): Promise<Task> {
-    const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    const task = await this.tasksService.update(userId, taskId, dto);
-    return task;
+    return await this.tasksService.update(taskId, dto);
   }
 
   @Delete(':id')
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
-  async delete(@Req() req: JwtRequest, @Param('id', ParseIntPipe) taskId: number): Promise<Task> {
-    const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    const task = await this.tasksService.delete(userId, taskId);
-    return task;
+  async delete(@Param('id', ParseIntPipe) taskId: number) {
+    return await this.tasksService.delete(taskId);
   }
 }

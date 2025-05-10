@@ -14,9 +14,9 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Subject } from '@prisma/client';
-import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
-import { JwtPayload, JwtRequest } from 'src/core/tokens/tokens.types';
 import { SubjectsService } from './subjects.service';
+import { JwtRequest, JwtPayload } from 'src/auth/auth.types';
+import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
 
@@ -31,18 +31,23 @@ export class SubjectsController {
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.CREATED)
   async create(@Req() req: JwtRequest, @Body() dto: CreateSubjectDto): Promise<Subject> {
-    const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    const subject = await this.subjectsService.create(userId, dto);
-    return subject;
+    const { sub: phoneId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
+    return await this.subjectsService.create(phoneId, dto);
+  }
+
+  @Get(':id')
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  async find(@Param('id', ParseIntPipe) subjectId: number): Promise<Subject> {
+    return await this.subjectsService.find(subjectId);
   }
 
   @Get()
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
   async findAll(@Req() req: JwtRequest): Promise<Subject[]> {
-    const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    const subjects = await this.subjectsService.findAll(userId);
-    return subjects;
+    const { sub: phoneId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
+    return await this.subjectsService.findAll(phoneId);
   }
 
   @Patch(':id')
@@ -50,23 +55,15 @@ export class SubjectsController {
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('id', ParseIntPipe) subjectId: number,
-    @Req() req: JwtRequest,
     @Body() dto: UpdateSubjectDto,
   ): Promise<Subject> {
-    const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    const subject = await this.subjectsService.update(userId, subjectId, dto);
-    return subject;
+    return await this.subjectsService.update(subjectId, dto);
   }
 
   @Delete(':id')
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
-  async delete(
-    @Param('id', ParseIntPipe) subjectId: number,
-    @Req() req: JwtRequest,
-  ): Promise<Subject> {
-    const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    const subject = await this.subjectsService.delete(userId, subjectId);
-    return subject;
+  async delete(@Param('id', ParseIntPipe) subjectId: number): Promise<Subject> {
+    return await this.subjectsService.delete(subjectId);
   }
 }

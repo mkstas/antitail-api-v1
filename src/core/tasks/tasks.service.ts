@@ -8,16 +8,15 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 export class TasksService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(userId: number, dto: CreateTaskDto): Promise<Task> {
-    const task = await this.prismaService.task.create({
-      data: { userId, ...dto },
+  async create(dto: CreateTaskDto): Promise<Task> {
+    return await this.prismaService.task.create({
+      data: { ...dto },
     });
-    return task;
   }
 
-  async find(userId: number, taskId: number): Promise<Task> {
-    const task = await this.prismaService.task.findFirst({
-      where: { userId, taskId },
+  async find(taskId: number): Promise<Task> {
+    const task = await this.prismaService.task.findUnique({
+      where: { taskId },
     });
     if (!task) {
       throw new NotFoundException('Task is not found');
@@ -25,72 +24,71 @@ export class TasksService {
     return task;
   }
 
-  async findAll(userId: number, subjects: string[], taskTypes: string[]): Promise<Task[]> {
+  async findAll(phoneId: number, subjects: string[], taskTypes: string[]): Promise<Task[]> {
     const updatedSubjects = subjects?.map(id => ({ subjectId: Number(id) }));
     const updatedTaskTypes = taskTypes?.map(id => ({ taskTypeId: Number(id) }));
-    let tasks: Task[] = [];
-
-    if (updatedSubjects && updatedTaskTypes) {
-      tasks = await this.prismaService.task.findMany({
-        where: {
-          userId,
-          AND: [{ OR: updatedSubjects }, { OR: updatedTaskTypes }],
+    const subjectTasks = await this.prismaService.subject.findMany({
+      where: { phoneId },
+      include: {
+        tasks: {
+          where: { AND: [{ OR: updatedSubjects }, { OR: updatedTaskTypes }] },
+          orderBy: [{ deadline: 'asc' }],
         },
-        orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
-      });
-    } else if (updatedSubjects) {
-      tasks = await this.prismaService.task.findMany({
-        where: {
-          userId,
-          OR: updatedSubjects,
-        },
-        orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
-      });
-    } else if (updatedTaskTypes) {
-      tasks = await this.prismaService.task.findMany({
-        where: {
-          userId,
-          OR: updatedTaskTypes,
-        },
-        orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
-      });
-    } else {
-      tasks = await this.prismaService.task.findMany({
-        where: { userId, OR: updatedSubjects },
-        orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
-      });
-    }
-
+      },
+    });
+    const tasks: Task[] = [];
+    subjectTasks.forEach(subject => {
+      subject.tasks.forEach(task => tasks.push(task));
+    });
+    tasks.sort((a, b) => Number(new Date(a.deadline)) - Number(new Date(b.deadline)));
+    tasks.sort((a, b) => Number(a.isDone) - Number(b.isDone));
     if (!tasks.length) {
       throw new NotFoundException('Tasks are not found');
     }
     return tasks;
   }
 
-  async update(userId: number, taskId: number, dto: UpdateTaskDto): Promise<Task> {
-    let task = await this.prismaService.task.findUnique({
-      where: { userId, taskId },
+  async findNotifications(phoneId: number): Promise<Task[]> {
+    const subjects = await this.prismaService.subject.findMany({
+      where: { phoneId },
+      include: {
+        tasks: {
+          orderBy: { deadline: 'asc' },
+        },
+      },
+    });
+    const tasks: Task[] = [];
+    subjects.forEach(subject => {
+      subject.tasks.forEach(task => tasks.push(task));
+    });
+    tasks.sort((a, b) => {
+      return Number(new Date(a.deadline)) - Number(new Date(b.deadline));
+    });
+    return tasks;
+  }
+
+  async update(taskId: number, dto: UpdateTaskDto): Promise<Task> {
+    const task = await this.prismaService.task.findUnique({
+      where: { taskId },
     });
     if (!task) {
       throw new NotFoundException('Task is not found');
     }
-    task = await this.prismaService.task.update({
+    return await this.prismaService.task.update({
       where: { taskId },
       data: { ...dto },
     });
-    return task;
   }
 
-  async delete(userId: number, taskId: number): Promise<Task> {
-    let task = await this.prismaService.task.findUnique({
-      where: { userId, taskId },
+  async delete(taskId: number): Promise<Task> {
+    const task = await this.prismaService.task.findUnique({
+      where: { taskId },
     });
     if (!task) {
       throw new NotFoundException('Task is not found');
     }
-    task = await this.prismaService.task.delete({
+    return await this.prismaService.task.delete({
       where: { taskId },
     });
-    return task;
   }
 }

@@ -8,16 +8,25 @@ import { UpdateSubjectDto } from './dto/update-subject.dto';
 export class SubjectsService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(userId: number, dto: CreateSubjectDto): Promise<Subject> {
-    const subject = await this.prismaService.subject.create({
-      data: { userId, ...dto },
+  async create(phoneId: number, dto: CreateSubjectDto): Promise<Subject> {
+    return await this.prismaService.subject.create({
+      data: { phoneId, ...dto },
     });
+  }
+
+  async find(subjectId: number): Promise<Subject> {
+    const subject = await this.prismaService.subject.findUnique({
+      where: { subjectId },
+    });
+    if (!subject) {
+      throw new NotFoundException('Subject is not found');
+    }
     return subject;
   }
 
-  async findAll(userId: number): Promise<Subject[]> {
+  async findAll(phoneId: number): Promise<Subject[]> {
     const subjects = await this.prismaService.subject.findMany({
-      where: { userId },
+      where: { phoneId },
       orderBy: { subjectId: 'asc' },
     });
     if (!subjects.length) {
@@ -26,30 +35,28 @@ export class SubjectsService {
     return subjects;
   }
 
-  async update(userId: number, subjectId: number, dto: UpdateSubjectDto): Promise<Subject> {
-    let subject = await this.prismaService.subject.findFirst({
-      where: { userId, subjectId },
+  async update(subjectId: number, dto: UpdateSubjectDto): Promise<Subject> {
+    const subject = await this.prismaService.subject.findFirst({
+      where: { subjectId },
     });
     if (!subject) {
       throw new NotFoundException('Subject is not found');
     }
-    subject = await this.prismaService.subject.update({
+    return await this.prismaService.subject.update({
       where: { subjectId },
-      data: { ...dto },
+      data: dto,
     });
-    return subject;
   }
 
-  async delete(userId: number, subjectId: number): Promise<Subject> {
-    let subject = await this.prismaService.subject.findFirst({
-      where: { userId, subjectId },
+  async delete(subjectId: number): Promise<Subject> {
+    const subject = await this.prismaService.subject.findFirst({
+      where: { subjectId },
     });
     if (!subject) {
       throw new NotFoundException('Subject is not found');
     }
-    subject = await this.prismaService.subject.delete({
+    return await this.prismaService.subject.delete({
       where: { subjectId },
     });
-    return subject;
   }
 }

@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -12,13 +11,13 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { TaskTypesService } from './task-types.service';
 import { TaskType } from '@prisma/client';
+import { JwtService } from '@nestjs/jwt';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
-import { JwtRequest, JwtPayload } from 'src/core/tokens/tokens.types';
+import { TaskTypesService } from './task-types.service';
 import { CreateTaskTypeDto } from './dto/create-task-type.dto';
 import { UpdateTaskTypeDto } from './dto/update-task-type.dto';
+import { JwtRequest, JwtPayload } from 'src/auth/auth.types';
 
 @Controller('task-types')
 export class TaskTypesController {
@@ -31,18 +30,23 @@ export class TaskTypesController {
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.CREATED)
   async create(@Req() req: JwtRequest, @Body() dto: CreateTaskTypeDto): Promise<TaskType> {
-    const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    const taskType = await this.taskTypesService.create(userId, dto);
-    return taskType;
+    const { sub: phoneId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
+    return await this.taskTypesService.create(phoneId, dto);
+  }
+
+  @Get(':id')
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  async find(@Param('id', ParseIntPipe) taskTypeId: number): Promise<TaskType> {
+    return await this.taskTypesService.find(taskTypeId);
   }
 
   @Get()
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
   async findAll(@Req() req: JwtRequest): Promise<TaskType[]> {
-    const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    const taskTypes = await this.taskTypesService.findAll(userId);
-    return taskTypes;
+    const { sub: phoneId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
+    return await this.taskTypesService.findAll(phoneId);
   }
 
   @Patch(':id')
@@ -50,23 +54,8 @@ export class TaskTypesController {
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('id', ParseIntPipe) taskTypeId: number,
-    @Req() req: JwtRequest,
     @Body() dto: UpdateTaskTypeDto,
-  ) {
-    const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    const taskType = await this.taskTypesService.update(userId, taskTypeId, dto);
-    return taskType;
-  }
-
-  @Delete(':id')
-  @UseGuards(AccessTokenGuard)
-  @HttpCode(HttpStatus.OK)
-  async delete(
-    @Param('id', ParseIntPipe) taskTypeId: number,
-    @Req() req: JwtRequest,
   ): Promise<TaskType> {
-    const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    const taskType = await this.taskTypesService.delete(userId, taskTypeId);
-    return taskType;
+    return await this.taskTypesService.update(taskTypeId, dto);
   }
 }

@@ -13,77 +13,61 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  userId       Int        @id @default(autoincrement()) @map("user_id")
-  email        String     @unique
-  passwordHash String     @map("password_hash")
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
-  Token        Token?
-  Subject      Subject[]
-  TaskType     TaskType[]
-  Task         Task[]
+model Phone {
+  phoneId   Int        @id @default(autoincrement()) @map("user_id")
+  phone     String     @unique
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  subjects  Subject[]
+  taskTypes TaskType[]
 
-  @@map("users")
-}
-
-model Token {
-  tokenId      Int      @id @default(autoincrement()) @map("token_id")
-  user         User     @relation(fields: [userId], references: [userId])
-  userId       Int      @unique @map("user_id")
-  refreshToken String   @unique @map("refresh_token")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-
-  @@map("tokens")
+  @@map("phones")
 }
 
 model Subject {
   subjectId Int      @id @default(autoincrement()) @map("subject_id")
-  user      User     @relation(fields: [userId], references: [userId])
-  userId    Int      @map("user_id")
+  phone     Phone    @relation(fields: [phoneId], references: [phoneId])
+  phoneId   Int      @map("phone_id")
   title     String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  Task      Task[]
+  tasks     Task[]
 
   @@map("subjects")
 }
 
 model TaskType {
   taskTypeId Int      @id @default(autoincrement()) @map("task_type_id")
-  user       User     @relation(fields: [userId], references: [userId])
-  userId     Int      @map("user_id")
+  phone      Phone    @relation(fields: [phoneId], references: [phoneId])
+  phoneId    Int      @map("phone_id")
   title      String
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
-  Task       Task[]
+  tasks      Task[]
 
   @@map("task_types")
 }
 
 model Task {
   taskId      Int       @id @default(autoincrement()) @map("task_id")
-  user        User      @relation(fields: [userId], references: [userId])
-  userId      Int       @map("user_id")
-  subject     Subject?  @relation(fields: [subjectId], references: [subjectId], onDelete: SetNull)
-  subjectId   Int?      @map("subject_id")
-  taskType    TaskType? @relation(fields: [taskTypeId], references: [taskTypeId], onDelete: SetNull)
-  taskTypeId  Int?      @map("task_type_id")
+  subject     Subject   @relation(fields: [subjectId], references: [subjectId], onDelete: Cascade)
+  subjectId   Int       @map("subject_id")
+  taskType    TaskType  @relation(fields: [taskTypeId], references: [taskTypeId], onDelete: Restrict)
+  taskTypeId  Int       @map("task_type_id")
   title       String
   description String
   deadline    DateTime
   isDone      Boolean   @default(false) @map("is_done")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
-  Subtask     Subtask[]
+  subtasks    Subtask[]
 
   @@map("tasks")
 }
 
 model Subtask {
   subtaskId   Int      @id @default(autoincrement()) @map("subtask_id")
-  task        Task     @relation(fields: [taskId], references: [taskId])
+  task        Task     @relation(fields: [taskId], references: [taskId], onDelete: Cascade)
   taskId      Int      @map("task_id")
   description String
   isDone      Boolean  @default(false) @map("is_done")

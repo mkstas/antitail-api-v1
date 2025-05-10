@@ -8,17 +8,25 @@ import { UpdateTaskTypeDto } from './dto/update-task-type.dto';
 export class TaskTypesService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(userId: number, dto: CreateTaskTypeDto): Promise<TaskType> {
-    const taskType = await this.prismaService.taskType.create({
-      data: { userId, ...dto },
+  async create(phoneId: number, dto: CreateTaskTypeDto): Promise<TaskType> {
+    return await this.prismaService.taskType.create({
+      data: { phoneId, ...dto },
     });
+  }
+
+  async find(taskTypeId: number): Promise<TaskType> {
+    const taskType = await this.prismaService.taskType.findUnique({
+      where: { taskTypeId },
+    });
+    if (!taskType) {
+      throw new NotFoundException('Task type is not found');
+    }
     return taskType;
   }
 
-  async findAll(userId: number): Promise<TaskType[]> {
+  async findAll(phoneId: number): Promise<TaskType[]> {
     const taskTypes = await this.prismaService.taskType.findMany({
-      where: { userId },
-      orderBy: { taskTypeId: 'asc' },
+      where: { phoneId },
     });
     if (!taskTypes.length) {
       throw new NotFoundException('Task types are not found');
@@ -26,30 +34,16 @@ export class TaskTypesService {
     return taskTypes;
   }
 
-  async update(userId: number, taskTypeId: number, dto: UpdateTaskTypeDto): Promise<TaskType> {
-    let taskType = await this.prismaService.taskType.findFirst({
-      where: { userId, taskTypeId },
+  async update(taskTypeId: number, dto: UpdateTaskTypeDto): Promise<TaskType> {
+    const taskType = await this.prismaService.taskType.findUnique({
+      where: { taskTypeId },
     });
     if (!taskType) {
       throw new NotFoundException('Task type is not found');
     }
-    taskType = await this.prismaService.taskType.update({
+    return await this.prismaService.taskType.update({
       where: { taskTypeId },
       data: { ...dto },
     });
-    return taskType;
-  }
-
-  async delete(userId: number, taskTypeId: number): Promise<TaskType> {
-    let taskType = await this.prismaService.taskType.findFirst({
-      where: { userId, taskTypeId },
-    });
-    if (!taskType) {
-      throw new NotFoundException('Task type is not found');
-    }
-    taskType = await this.prismaService.taskType.delete({
-      where: { taskTypeId },
-    });
-    return taskType;
   }
 }
