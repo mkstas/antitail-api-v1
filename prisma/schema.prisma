@@ -14,11 +14,12 @@ datasource db {
 }
 
 model Phone {
-  phoneId   Int       @id @default(autoincrement()) @map("user_id")
-  phone     String    @unique
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  Subject   Subject[]
+  phoneId   Int        @id @default(autoincrement()) @map("user_id")
+  phone     String     @unique
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  subjects  Subject[]
+  taskTypes TaskType[]
 
   @@map("phones")
 }
@@ -30,37 +31,36 @@ model Subject {
   title     String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  Task      Task[]
-  Type      Type[]
+  tasks     Task[]
 
   @@map("subjects")
 }
 
-model Type {
-  typeId    Int      @id @default(autoincrement()) @map("type_id")
-  subject   Subject  @relation(fields: [subjectId], references: [subjectId], onDelete: Cascade)
-  subjectId Int
-  title     String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  Task      Task[]
+model TaskType {
+  taskTypeId Int      @id @default(autoincrement()) @map("task_type_id")
+  phone      Phone    @relation(fields: [phoneId], references: [phoneId])
+  phoneId    Int      @map("phone_id")
+  title      String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  tasks      Task[]
 
-  @@map("types")
+  @@map("task_types")
 }
 
 model Task {
   taskId      Int       @id @default(autoincrement()) @map("task_id")
   subject     Subject   @relation(fields: [subjectId], references: [subjectId], onDelete: Cascade)
   subjectId   Int       @map("subject_id")
-  type        Type      @relation(fields: [typeId], references: [typeId], onDelete: Restrict)
-  typeId      Int       @map("type_id")
+  taskType    TaskType  @relation(fields: [taskTypeId], references: [taskTypeId], onDelete: Restrict)
+  taskTypeId  Int       @map("task_type_id")
   title       String
   description String
   deadline    DateTime
   isDone      Boolean   @default(false) @map("is_done")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
-  Subtask     Subtask[]
+  subtasks    Subtask[]
 
   @@map("tasks")
 }

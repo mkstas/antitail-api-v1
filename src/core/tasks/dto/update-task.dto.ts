@@ -6,7 +6,7 @@ export class UpdateTaskDto extends CreateTaskDto {
   readonly subjectId: number;
 
   @IsOptional()
-  readonly typeId: number;
+  readonly taskTypeId: number;
 
   @IsOptional()
   readonly title: string;

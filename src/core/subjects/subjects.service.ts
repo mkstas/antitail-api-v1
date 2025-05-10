@@ -27,6 +27,7 @@ export class SubjectsService {
   async findAll(phoneId: number): Promise<Subject[]> {
     const subjects = await this.prismaService.subject.findMany({
       where: { phoneId },
+      orderBy: { subjectId: 'asc' },
     });
     if (!subjects.length) {
       throw new NotFoundException('Subjects are not found');

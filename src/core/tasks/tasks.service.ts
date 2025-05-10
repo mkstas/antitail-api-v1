@@ -8,14 +8,14 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 export class TasksService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(phoneId: number, dto: CreateTaskDto): Promise<Task> {
+  async create(dto: CreateTaskDto): Promise<Task> {
     return await this.prismaService.task.create({
-      data: { phoneId, ...dto },
+      data: { ...dto },
     });
   }
 
   async find(taskId: number): Promise<Task> {
-    const task = await this.prismaService.task.findFirst({
+    const task = await this.prismaService.task.findUnique({
       where: { taskId },
     });
     if (!task) {
@@ -26,48 +26,54 @@ export class TasksService {
 
   async findAll(phoneId: number, subjects: string[], taskTypes: string[]): Promise<Task[]> {
     const updatedSubjects = subjects?.map(id => ({ subjectId: Number(id) }));
-    const updatedTypes = taskTypes?.map(id => ({ typeId: Number(id) }));
-    let tasks: Task[] = [];
-
-    if (updatedSubjects && updatedTypes) {
-      tasks = await this.prismaService.task.findMany({
-        where: {
-          phoneId,
-          AND: [{ OR: updatedSubjects }, { OR: updatedTypes }],
+    const updatedTaskTypes = taskTypes?.map(id => ({ taskTypeId: Number(id) }));
+    const subjectTasks = await this.prismaService.subject.findMany({
+      where: { phoneId },
+      include: {
+        tasks: {
+          where: { AND: [{ OR: updatedSubjects }, { OR: updatedTaskTypes }] },
+          orderBy: [{ deadline: 'asc' }],
         },
-        orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
-      });
-    } else if (updatedSubjects) {
-      tasks = await this.prismaService.task.findMany({
-        where: {
-          phoneId,
-          OR: updatedSubjects,
-        },
-        orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
-      });
-    } else if (updatedTypes) {
-      tasks = await this.prismaService.task.findMany({
-        where: {
-          phoneId,
-          OR: updatedTypes,
-        },
-        orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
-      });
-    } else {
-      tasks = await this.prismaService.task.findMany({
-        where: { phoneId, OR: updatedSubjects },
-        orderBy: [{ isDone: 'asc' }, { deadline: 'asc' }],
-      });
-    }
-
+      },
+    });
+    const tasks: Task[] = [];
+    subjectTasks.forEach(subject => {
+      subject.tasks.forEach(task => tasks.push(task));
+    });
+    tasks.sort((a, b) => Number(new Date(a.deadline)) - Number(new Date(b.deadline)));
+    tasks.sort((a, b) => Number(a.isDone) - Number(b.isDone));
     if (!tasks.length) {
       throw new NotFoundException('Tasks are not found');
     }
     return tasks;
   }
 
+  async findNotifications(phoneId: number): Promise<Task[]> {
+    const subjects = await this.prismaService.subject.findMany({
+      where: { phoneId },
+      include: {
+        tasks: {
+          orderBy: { deadline: 'asc' },
+        },
+      },
+    });
+    const tasks: Task[] = [];
+    subjects.forEach(subject => {
+      subject.tasks.forEach(task => tasks.push(task));
+    });
+    tasks.sort((a, b) => {
+      return Number(new Date(a.deadline)) - Number(new Date(b.deadline));
+    });
+    return tasks;
+  }
+
   async update(taskId: number, dto: UpdateTaskDto): Promise<Task> {
-    await this.find(taskId);
+    const task = await this.prismaService.task.findUnique({
+      where: { taskId },
+    });
+    if (!task) {
+      throw new NotFoundException('Task is not found');
+    }
     return await this.prismaService.task.update({
       where: { taskId },
       data: { ...dto },
@@ -75,7 +81,12 @@ export class TasksService {
   }
 
   async delete(taskId: number): Promise<Task> {
-    await this.find(taskId);
+    const task = await this.prismaService.task.findUnique({
+      where: { taskId },
+    });
+    if (!task) {
+      throw new NotFoundException('Task is not found');
+    }
     return await this.prismaService.task.delete({
       where: { taskId },
     });

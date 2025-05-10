@@ -12,10 +12,10 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { Subtask } from '@prisma/client';
-import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { SubtasksService } from './subtasks.service';
+import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { CreateSubtaskDto } from './dto/create-subtask.dto';
+import { Subtask } from '@prisma/client';
 import { UpdateSubtaskDto } from './dto/update-subtask.dto';
 
 @Controller('subtasks')
@@ -24,7 +24,7 @@ export class SubtasksController {
 
   @Post()
   @UseGuards(AccessTokenGuard)
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.OK)
   async create(@Body() dto: CreateSubtaskDto): Promise<Subtask> {
     return await this.subtasksService.create(dto);
   }

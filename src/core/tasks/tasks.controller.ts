@@ -13,11 +13,11 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Task } from '@prisma/client';
+import { JwtService } from '@nestjs/jwt';
 import { TasksService } from './tasks.service';
-import { JwtRequest, JwtPayload } from 'src/auth/auth.types';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
+import { JwtPayload, JwtRequest } from 'src/auth/auth.types';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 
@@ -31,23 +31,30 @@ export class TasksController {
   @Post()
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.CREATED)
-  async create(@Req() req: JwtRequest, @Body() dto: CreateTaskDto): Promise<Task> {
-    const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    return await this.tasksService.create(userId, dto);
+  async create(@Body() dto: CreateTaskDto): Promise<Task> {
+    return await this.tasksService.create(dto);
   }
 
   @Get()
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
   async findAll(
-    @Query('subjectId') subjectId: string,
-    @Query('typeId') typeId: string,
     @Req() req: JwtRequest,
+    @Query('subjectId') subjectId: string,
+    @Query('taskTypeId') taskTypeId: string,
   ): Promise<Task[]> {
-    const { sub: userId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
+    const { sub: phoneId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
     const subjects = subjectId?.split(',');
-    const types = typeId?.split(',');
-    return await this.tasksService.findAll(userId, subjects, types);
+    const taskTypes = taskTypeId?.split(',');
+    return await this.tasksService.findAll(phoneId, subjects, taskTypes);
+  }
+
+  @Get('notifications')
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  async findNotifications(@Req() req: JwtRequest) {
+    const { sub: phoneId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
+    return await this.tasksService.findNotifications(phoneId);
   }
 
   @Get(':id')
@@ -70,7 +77,7 @@ export class TasksController {
   @Delete(':id')
   @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.OK)
-  async delete(@Param('id', ParseIntPipe) taskId: number): Promise<Task> {
+  async delete(@Param('id', ParseIntPipe) taskId: number) {
     return await this.tasksService.delete(taskId);
   }
 }

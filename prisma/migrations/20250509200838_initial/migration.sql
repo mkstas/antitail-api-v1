@@ -20,22 +20,21 @@ CREATE TABLE "subjects" (
 );
 
 -- CreateTable
-CREATE TABLE "types" (
-    "type_id" SERIAL NOT NULL,
+CREATE TABLE "task_types" (
+    "task_type_id" SERIAL NOT NULL,
     "phone_id" INTEGER NOT NULL,
     "title" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "types_pkey" PRIMARY KEY ("type_id")
+    CONSTRAINT "task_types_pkey" PRIMARY KEY ("task_type_id")
 );
 
 -- CreateTable
 CREATE TABLE "tasks" (
     "task_id" SERIAL NOT NULL,
-    "phone_id" INTEGER NOT NULL,
     "subject_id" INTEGER NOT NULL,
-    "type_id" INTEGER NOT NULL,
+    "task_type_id" INTEGER NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "deadline" TIMESTAMP(3) NOT NULL,
@@ -65,16 +64,13 @@ CREATE UNIQUE INDEX "phones_phone_key" ON "phones"("phone");
 ALTER TABLE "subjects" ADD CONSTRAINT "subjects_phone_id_fkey" FOREIGN KEY ("phone_id") REFERENCES "phones"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "types" ADD CONSTRAINT "types_phone_id_fkey" FOREIGN KEY ("phone_id") REFERENCES "phones"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "task_types" ADD CONSTRAINT "task_types_phone_id_fkey" FOREIGN KEY ("phone_id") REFERENCES "phones"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "tasks" ADD CONSTRAINT "tasks_phone_id_fkey" FOREIGN KEY ("phone_id") REFERENCES "phones"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "tasks" ADD CONSTRAINT "tasks_subject_id_fkey" FOREIGN KEY ("subject_id") REFERENCES "subjects"("subject_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "tasks" ADD CONSTRAINT "tasks_subject_id_fkey" FOREIGN KEY ("subject_id") REFERENCES "subjects"("subject_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "tasks" ADD CONSTRAINT "tasks_task_type_id_fkey" FOREIGN KEY ("task_type_id") REFERENCES "task_types"("task_type_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "tasks" ADD CONSTRAINT "tasks_type_id_fkey" FOREIGN KEY ("type_id") REFERENCES "types"("type_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "subtasks" ADD CONSTRAINT "subtasks_task_id_fkey" FOREIGN KEY ("task_id") REFERENCES "tasks"("task_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "subtasks" ADD CONSTRAINT "subtasks_task_id_fkey" FOREIGN KEY ("task_id") REFERENCES "tasks"("task_id") ON DELETE CASCADE ON UPDATE CASCADE;
