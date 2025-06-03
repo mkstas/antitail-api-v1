@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Post, Res, UseGuards } from '@nestjs/com
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto.';
-import { setJwtCookie } from 'src/shared/utils/jwt-cookies';
+import { setJwtCookie } from 'src/common/utils/jwt-cookies';
 import { AccessTokenGuard } from './guards/access-token.guard';
 
 @Controller('auth')

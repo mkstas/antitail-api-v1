@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { TasksController } from './tasks.controller';
 import { TasksService } from './tasks.service';
+import { TasksController } from './tasks.controller';
 
 @Module({
   imports: [JwtModule],

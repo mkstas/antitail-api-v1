@@ -1,6 +1,6 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { JwtRequest, JwtPayload } from 'src/auth/auth.types';
+import { JwtPayload, JwtRequest } from 'src/common/utils/jwt-cookies';
 
 export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt-access') {
   constructor() {
