@@ -14,32 +14,32 @@ datasource db {
 }
 
 model Phone {
-  phoneId   Int        @id @default(autoincrement()) @map("user_id")
-  phone     String     @unique
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
-  subjects  Subject[]
-  taskTypes TaskType[]
+  phoneId     String     @id @default(uuid()) @map("phone_id")
+  phoneNumber String     @unique @map("phone_number")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+  subjects    Subject[]
+  taskTypes   TaskType[]
 
   @@map("phones")
 }
 
 model Subject {
-  subjectId Int      @id @default(autoincrement()) @map("subject_id")
-  phone     Phone    @relation(fields: [phoneId], references: [phoneId])
-  phoneId   Int      @map("phone_id")
-  title     String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  tasks     Task[]
+  subjectId   String   @id @default(uuid()) @map("subject_id")
+  phoneNumber Phone    @relation(fields: [phoneId], references: [phoneId])
+  phoneId     String   @map("phone_id")
+  title       String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  tasks       Task[]
 
   @@map("subjects")
 }
 
 model TaskType {
-  taskTypeId Int      @id @default(autoincrement()) @map("task_type_id")
+  taskTypeId String   @id @default(uuid()) @map("task_type_id")
   phone      Phone    @relation(fields: [phoneId], references: [phoneId])
-  phoneId    Int      @map("phone_id")
+  phoneId    String   @map("phone_id")
   title      String
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
@@ -49,13 +49,13 @@ model TaskType {
 }
 
 model Task {
-  taskId      Int       @id @default(autoincrement()) @map("task_id")
+  taskId      String    @id @default(uuid()) @map("task_id")
   subject     Subject   @relation(fields: [subjectId], references: [subjectId], onDelete: Cascade)
-  subjectId   Int       @map("subject_id")
-  taskType    TaskType  @relation(fields: [taskTypeId], references: [taskTypeId], onDelete: Restrict)
-  taskTypeId  Int       @map("task_type_id")
+  subjectId   String    @map("subject_id")
+  taskType    TaskType  @relation(fields: [taskTypeId], references: [taskTypeId], onDelete: Cascade)
+  taskTypeId  String    @map("task_type_id")
   title       String
-  description String
+  description String?
   deadline    DateTime
   isDone      Boolean   @default(false) @map("is_done")
   createdAt   DateTime  @default(now()) @map("created_at")
@@ -66,9 +66,9 @@ model Task {
 }
 
 model Subtask {
-  subtaskId   Int      @id @default(autoincrement()) @map("subtask_id")
+  subtaskId   String   @id @default(uuid()) @map("subtask_id")
   task        Task     @relation(fields: [taskId], references: [taskId], onDelete: Cascade)
-  taskId      Int      @map("task_id")
+  taskId      String   @map("task_id")
   description String
   isDone      Boolean  @default(false) @map("is_done")
   createdAt   DateTime @default(now()) @map("created_at")
