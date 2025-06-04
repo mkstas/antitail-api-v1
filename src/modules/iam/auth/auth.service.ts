@@ -11,7 +11,11 @@ export class AuthService {
   ) {}
 
   async login(loginDto: LoginDto): Promise<string> {
-    const candidate = await this.phonesService.create(loginDto);
+    let candidate = await this.phonesService.findByPhoneNumber(loginDto.phoneNumber);
+
+    if (!candidate) {
+      candidate = await this.phonesService.create(loginDto);
+    }
 
     return await this.generateAccessToken(candidate.phoneId);
   }

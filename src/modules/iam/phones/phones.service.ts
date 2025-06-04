@@ -36,6 +36,18 @@ export class PhonesService {
     return phoneNumber;
   }
 
+  async findByPhoneNumber(phoneNumber: string): Promise<Phone | null> {
+    const phone = await this.prismaService.phone.findUnique({
+      where: { phoneNumber },
+    });
+
+    if (phone) {
+      return phone;
+    }
+
+    return null;
+  }
+
   async update(id: string, updatePhoneDto: UpdatePhoneDto): Promise<Phone> {
     const phoneNumber = await this.findOne(id);
     const updatedPhoneNumber = await this.prismaService.phone.update({
