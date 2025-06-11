@@ -33,6 +33,10 @@ export class SubjectsService {
       where: { subjectId: id },
     });
 
+    if (!subject) {
+      throw new NotFoundException('Subject is not found');
+    }
+
     return subject;
   }
 

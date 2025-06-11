@@ -33,6 +33,10 @@ export class TaskTypesService {
       where: { taskTypeId: id },
     });
 
+    if (!taskType) {
+      throw new NotFoundException('Task type is not found');
+    }
+
     return taskType;
   }
 

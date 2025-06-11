@@ -2,68 +2,68 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { Phone } from '@prisma/client';
 import { CreatePhoneDto } from './dto/create-phone.dto';
 import { UpdatePhoneDto } from './dto/update-phone.dto';
-import { PrismaService } from 'src/common/prisma/prisma.service';
+import { PrismaService } from '../../../common/prisma/prisma.service';
 
 @Injectable()
 export class PhonesService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createPhoneDto: CreatePhoneDto): Promise<Phone> {
-    const phoneNumber = await this.prismaService.phone.findUnique({
+    const phone = await this.prismaService.phone.findUnique({
       where: { phoneNumber: createPhoneDto.phoneNumber },
     });
 
-    if (phoneNumber) {
+    if (phone) {
       throw new BadRequestException('Phone number is already exists');
     }
 
-    const newPhoneNumber = await this.prismaService.phone.create({
+    const newPhone = await this.prismaService.phone.create({
       data: { phoneNumber: createPhoneDto.phoneNumber },
     });
 
-    return newPhoneNumber;
+    return newPhone;
   }
 
   async findOne(id: string): Promise<Phone> {
-    const phoneNumber = await this.prismaService.phone.findUnique({
+    const phone = await this.prismaService.phone.findUnique({
       where: { phoneId: id },
     });
 
-    if (!phoneNumber) {
+    if (!phone) {
       throw new NotFoundException('Phone number is not found');
     }
 
-    return phoneNumber;
+    return phone;
   }
 
-  async findByPhoneNumber(phoneNumber: string): Promise<Phone | null> {
+  async findByPhoneNumber(phoneNumber: string): Promise<Phone> {
     const phone = await this.prismaService.phone.findUnique({
       where: { phoneNumber },
     });
 
-    if (phone) {
-      return phone;
+    if (!phone) {
+      throw new NotFoundException('Phone number is not found');
     }
 
-    return null;
+    return phone;
   }
 
   async update(id: string, updatePhoneDto: UpdatePhoneDto): Promise<Phone> {
-    const phoneNumber = await this.findOne(id);
-    const updatedPhoneNumber = await this.prismaService.phone.update({
-      where: { phoneId: phoneNumber.phoneId },
+    const phone = await this.findOne(id);
+    const updatedPhone = await this.prismaService.phone.update({
+      where: { phoneId: phone.phoneId },
       data: { phoneNumber: updatePhoneDto.phoneNumber },
     });
 
-    return updatedPhoneNumber;
+    return updatedPhone;
   }
 
   async remove(id: string): Promise<Phone> {
-    const phoneNumber = await this.findOne(id);
-    const removedPhoneNumber = await this.prismaService.phone.delete({
-      where: { phoneId: phoneNumber.phoneId },
+    const phone = await this.findOne(id);
+    const removedPhone = await this.prismaService.phone.delete({
+      where: { phoneId: phone.phoneId },
     });
 
-    return removedPhoneNumber;
+    return removedPhone;
   }
 }

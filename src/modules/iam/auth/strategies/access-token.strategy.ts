@@ -8,7 +8,7 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt-access'
       jwtFromRequest: ExtractJwt.fromExtractors([
         (req: JwtRequest): string => req.cookies.accessToken,
       ]),
-      secretOrKey: process.env.JWT_ACCESS_SECRET,
+      secretOrKey: process.env.JWT_ACCESS_SECRET ?? 'jwt-access-secret',
     });
   }
 
