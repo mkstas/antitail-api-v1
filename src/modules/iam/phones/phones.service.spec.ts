@@ -1,24 +1,45 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { Phone } from '@prisma/client';
 import { PhonesService } from './phones.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
+import { CreatePhoneDto } from './dto/create-phone.dto';
+import { UpdatePhoneDto } from './dto/update-phone.dto';
 
 const phoneId = '68cc942b-41c7-4c93-b214-d4f26b4577ee';
-const phoneNumber = '79000000002';
+const phoneNumber = '79000000000';
 const updatedPhoneNumber = '79000000001';
-const phone = { phoneId, phoneNumber };
 
-const database = {
+const createPhoneDto: CreatePhoneDto = {
+  phoneNumber,
+};
+
+const updatePhoneDto: UpdatePhoneDto = {
+  phoneNumber: updatedPhoneNumber,
+};
+
+const phone: Phone = {
+  phoneId,
+  phoneNumber,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+const updatedPhone: Phone = {
+  ...phone,
+  phoneNumber: updatedPhoneNumber,
+};
+
+const mockPrisma = {
   phone: {
-    findUnique: jest.fn().mockResolvedValue(phone),
-    findOne: jest.fn().mockResolvedValue(phone),
-    create: jest.fn().mockResolvedValue(phone),
-    update: jest.fn().mockResolvedValue(phone),
-    delete: jest.fn().mockResolvedValue(phone),
+    create: jest.fn(),
+    findUnique: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
   },
 };
 
-describe('Phones Service', () => {
+describe('PhonesService', () => {
   let service: PhonesService;
 
   beforeEach(async () => {
@@ -27,7 +48,7 @@ describe('Phones Service', () => {
         PhonesService,
         {
           provide: PrismaService,
-          useValue: database,
+          useValue: mockPrisma,
         },
       ],
     }).compile();
@@ -39,34 +60,86 @@ describe('Phones Service', () => {
     expect(service).toBeDefined();
   });
 
-  it('should create a new phone number', async () => {
-    expect(await service.create({ phoneNumber })).toEqual(phone);
+  describe('create', () => {
+    it('should create a new phone', async () => {
+      mockPrisma.phone.findUnique.mockResolvedValue(null);
+      mockPrisma.phone.create.mockResolvedValue(phone);
+
+      await expect(service.create(createPhoneDto)).resolves.toEqual(phone);
+    });
+
+    it('should throw an exception if phone is already exists', async () => {
+      mockPrisma.phone.findUnique.mockResolvedValue(phone);
+
+      await expect(service.create(createPhoneDto)).rejects.toThrow(
+        new BadRequestException('Phone number is already exists'),
+      );
+    });
   });
 
-  it('should throw an exception if phone number is already exists', async () => {
-    try {
-      await service.create({ phoneNumber });
-    } catch (error) {
-      expect(error).toBeInstanceOf(BadRequestException);
-      if (error instanceof BadRequestException) {
-        expect(error.message).toBe('Phone number is already exists');
-      }
-    }
+  describe('findById', () => {
+    it('should return a phone by id', async () => {
+      mockPrisma.phone.findUnique.mockResolvedValue(phone);
+
+      await expect(service.findById(phoneId)).resolves.toEqual(phone);
+    });
+
+    it('should throw an exception if phone is not found', async () => {
+      mockPrisma.phone.findUnique.mockResolvedValue(null);
+
+      await expect(service.findById(phoneId)).rejects.toThrow(
+        new NotFoundException('Phone number is not found'),
+      );
+    });
   });
 
-  it('should return a phone number by id', async () => {
-    expect(await service.findOne(phoneId)).toEqual(phone);
+  describe('findByPhoneNumber', () => {
+    it('should return a phone by phone number', async () => {
+      mockPrisma.phone.findUnique.mockResolvedValue(phone);
+
+      await expect(service.findByPhoneNumber(phoneNumber)).resolves.toEqual(phone);
+    });
+
+    it('should throw an exception if phone is not found', async () => {
+      mockPrisma.phone.findUnique.mockResolvedValue(null);
+
+      await expect(service.findByPhoneNumber(phoneNumber)).rejects.toThrow(
+        new NotFoundException('Phone number is not found'),
+      );
+    });
   });
 
-  it('should return a phone number by phone number', async () => {
-    expect(await service.findByPhoneNumber(phoneNumber)).toEqual(phone);
+  describe('update', () => {
+    it('should return an updated phone', async () => {
+      mockPrisma.phone.findUnique.mockResolvedValue(phone);
+      mockPrisma.phone.update.mockResolvedValue(updatedPhone);
+
+      await expect(service.update(phoneId, updatePhoneDto)).resolves.toEqual(updatedPhone);
+    });
+
+    it('should throw an exception if phone is not found for update', async () => {
+      mockPrisma.phone.findUnique.mockResolvedValue(null);
+
+      await expect(service.update(phoneId, updatePhoneDto)).rejects.toThrow(
+        new NotFoundException('Phone number is not found'),
+      );
+    });
   });
 
-  it('should return an updated phone number', async () => {
-    expect(await service.update(phoneId, { phoneNumber: updatedPhoneNumber })).toEqual(phone);
-  });
+  describe('remove', () => {
+    it('should return a removed phone', async () => {
+      mockPrisma.phone.findUnique.mockResolvedValue(phone);
+      mockPrisma.phone.delete.mockResolvedValue(updatedPhone);
 
-  it('should return a removed phone number', async () => {
-    expect(await service.remove(phoneId));
+      await expect(service.remove(phoneId)).resolves.toEqual(updatedPhone);
+    });
+
+    it('should throw an exception if phone is not found for remove', async () => {
+      mockPrisma.phone.findUnique.mockResolvedValue(null);
+
+      await expect(service.remove(phoneId)).rejects.toThrow(
+        new NotFoundException('Phone number is not found'),
+      );
+    });
   });
 });

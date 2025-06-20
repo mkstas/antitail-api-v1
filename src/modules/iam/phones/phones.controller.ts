@@ -16,8 +16,8 @@ export class PhonesController {
 
   @Get(':id')
   @UseGuards(AccessTokenGuard)
-  findOne(@Param('id') id: string): Promise<Phone> {
-    return this.phonesService.findOne(id);
+  findById(@Param('id') id: string): Promise<Phone> {
+    return this.phonesService.findById(id);
   }
 
   @Patch(':id')

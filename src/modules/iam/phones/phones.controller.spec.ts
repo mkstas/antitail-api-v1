@@ -1,18 +1,33 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { Phone } from '@prisma/client';
 import { PhonesController } from './phones.controller';
 import { PhonesService } from './phones.service';
+import { CreatePhoneDto } from './dto/create-phone.dto';
+import { UpdatePhoneDto } from './dto/update-phone.dto';
 
 const phoneId = '68cc942b-41c7-4c93-b214-d4f26b4577ee';
 const phoneNumber = '79000000000';
 const updatedPhoneNumber = '79000000001';
-const phone = { phoneId, phoneNumber };
 
-const value = {
-  create: jest.fn().mockResolvedValue(phone),
-  findOne: jest.fn().mockResolvedValue(phone),
-  update: jest.fn().mockResolvedValue(phone),
-  remove: jest.fn().mockResolvedValue(phone),
+const createPhoneDto: CreatePhoneDto = {
+  phoneNumber,
+};
+
+const updatePhoneDto: UpdatePhoneDto = {
+  phoneNumber: updatedPhoneNumber,
+};
+
+const phone: Phone = {
+  phoneId,
+  phoneNumber,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+const updatedPhone: Phone = {
+  ...phone,
+  phoneNumber: updatedPhoneNumber,
 };
 
 describe('Phones Controller', () => {
@@ -25,7 +40,12 @@ describe('Phones Controller', () => {
       providers: [
         {
           provide: PhonesService,
-          useValue: value,
+          useValue: {
+            create: jest.fn(),
+            findById: jest.fn(),
+            update: jest.fn(),
+            remove: jest.fn(),
+          },
         },
       ],
     }).compile();
@@ -38,79 +58,75 @@ describe('Phones Controller', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should create a new phone number', async () => {
-    expect(await controller.create({ phoneNumber })).toEqual(phone);
+  describe('create', () => {
+    it('should create a new phone number', async () => {
+      jest.spyOn(service, 'create').mockResolvedValue(phone);
+
+      await expect(controller.create(createPhoneDto)).resolves.toEqual(phone);
+    });
+
+    it('should throw an exception from service if phone is already exists', async () => {
+      jest
+        .spyOn(service, 'create')
+        .mockRejectedValue(new BadRequestException('Phone number is already exists'));
+
+      await expect(controller.create(createPhoneDto)).rejects.toThrow(
+        new BadRequestException('Phone number is already exists'),
+      );
+    });
   });
 
-  it('should throw an exception if phone number is already exists', async () => {
-    jest
-      .spyOn(service, 'create')
-      .mockRejectedValue(new BadRequestException('Phone number is already exists'));
+  describe('findById', () => {
+    it('should return a phone by id', async () => {
+      jest.spyOn(service, 'findById').mockResolvedValue(phone);
 
-    try {
-      await controller.create({ phoneNumber });
-    } catch (error) {
-      expect(error).toBeInstanceOf(BadRequestException);
-      if (error instanceof BadRequestException) {
-        expect(error.message).toBe('Phone number is already exists');
-      }
-    }
+      await expect(controller.findById(phoneId)).resolves.toEqual(phone);
+    });
+
+    it('should throw an exception from service if phone is not found', async () => {
+      jest
+        .spyOn(service, 'findById')
+        .mockRejectedValue(new NotFoundException('Phone number is not found'));
+
+      await expect(controller.findById(phoneId)).rejects.toThrow(
+        new NotFoundException('Phone number is not found'),
+      );
+    });
   });
 
-  it('should return a phone number', async () => {
-    expect(await controller.findOne(phoneId)).toEqual(phone);
+  describe('update', () => {
+    it('should return an updated phone', async () => {
+      jest.spyOn(service, 'update').mockResolvedValue(updatedPhone);
+
+      await expect(controller.update(phoneId, updatePhoneDto)).resolves.toEqual(updatedPhone);
+    });
+
+    it('should throw an exception from service if phone is not found for update', async () => {
+      jest
+        .spyOn(service, 'update')
+        .mockRejectedValue(new NotFoundException('Phone number is not found'));
+
+      await expect(controller.update(phoneId, updatePhoneDto)).rejects.toThrow(
+        new NotFoundException('Phone number is not found'),
+      );
+    });
   });
 
-  it('should throw an exception if phone number is not found', async () => {
-    jest
-      .spyOn(service, 'findOne')
-      .mockRejectedValue(new NotFoundException('Phone number is not found'));
+  describe('remove', () => {
+    it('should return a removed phone', async () => {
+      jest.spyOn(service, 'remove').mockResolvedValue(phone);
 
-    try {
-      await controller.findOne('00000000');
-    } catch (error) {
-      expect(error).toBeInstanceOf(NotFoundException);
-      if (error instanceof NotFoundException) {
-        expect(error.message).toBe('Phone number is not found');
-      }
-    }
-  });
+      await expect(controller.remove(phoneId)).resolves.toEqual(phone);
+    });
 
-  it('should return an updated phone number', async () => {
-    expect(await controller.update(phoneId, { phoneNumber: updatedPhoneNumber }));
-  });
+    it('should throw an exception from service if phone is not found for remove', async () => {
+      jest
+        .spyOn(service, 'remove')
+        .mockRejectedValue(new NotFoundException('Phone number is not found'));
 
-  it('should throw an exception if phone number is not found', async () => {
-    jest
-      .spyOn(service, 'findOne')
-      .mockRejectedValue(new NotFoundException('Phone number is not found'));
-
-    try {
-      await controller.update('00000000', { phoneNumber: updatedPhoneNumber });
-    } catch (error) {
-      expect(error).toBeInstanceOf(NotFoundException);
-      if (error instanceof NotFoundException) {
-        expect(error.message).toBe('Phone number is not found');
-      }
-    }
-  });
-
-  it('should return a removed phone number', async () => {
-    expect(await controller.remove(phoneId));
-  });
-
-  it('should throw an exception if phone number is not found', async () => {
-    jest
-      .spyOn(service, 'findOne')
-      .mockRejectedValue(new NotFoundException('Phone number is not found'));
-
-    try {
-      await controller.remove('00000000');
-    } catch (error) {
-      expect(error).toBeInstanceOf(NotFoundException);
-      if (error instanceof NotFoundException) {
-        expect(error.message).toBe('Phone number is not found');
-      }
-    }
+      await expect(controller.remove(phoneId)).rejects.toThrow(
+        new NotFoundException('Phone number is not found'),
+      );
+    });
   });
 });

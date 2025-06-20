@@ -24,7 +24,7 @@ export class PhonesService {
     return newPhone;
   }
 
-  async findOne(id: string): Promise<Phone> {
+  async findById(id: string): Promise<Phone> {
     const phone = await this.prismaService.phone.findUnique({
       where: { phoneId: id },
     });
@@ -49,7 +49,8 @@ export class PhonesService {
   }
 
   async update(id: string, updatePhoneDto: UpdatePhoneDto): Promise<Phone> {
-    const phone = await this.findOne(id);
+    const phone = await this.findById(id);
+
     const updatedPhone = await this.prismaService.phone.update({
       where: { phoneId: phone.phoneId },
       data: { phoneNumber: updatePhoneDto.phoneNumber },
@@ -59,7 +60,8 @@ export class PhonesService {
   }
 
   async remove(id: string): Promise<Phone> {
-    const phone = await this.findOne(id);
+    const phone = await this.findById(id);
+
     const removedPhone = await this.prismaService.phone.delete({
       where: { phoneId: phone.phoneId },
     });
