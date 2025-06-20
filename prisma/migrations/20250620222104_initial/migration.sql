@@ -12,7 +12,6 @@ CREATE TABLE "phones" (
 CREATE TABLE "subjects" (
     "subject_id" TEXT NOT NULL,
     "phone_id" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -22,7 +21,7 @@ CREATE TABLE "subjects" (
 -- CreateTable
 CREATE TABLE "task_types" (
     "task_type_id" TEXT NOT NULL,
-    "phone_id" TEXT NOT NULL,
+    "subject_id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -33,7 +32,6 @@ CREATE TABLE "task_types" (
 -- CreateTable
 CREATE TABLE "tasks" (
     "task_id" TEXT NOT NULL,
-    "subject_id" TEXT NOT NULL,
     "task_type_id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT,
@@ -64,10 +62,7 @@ CREATE UNIQUE INDEX "phones_phone_number_key" ON "phones"("phone_number");
 ALTER TABLE "subjects" ADD CONSTRAINT "subjects_phone_id_fkey" FOREIGN KEY ("phone_id") REFERENCES "phones"("phone_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "task_types" ADD CONSTRAINT "task_types_phone_id_fkey" FOREIGN KEY ("phone_id") REFERENCES "phones"("phone_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "tasks" ADD CONSTRAINT "tasks_subject_id_fkey" FOREIGN KEY ("subject_id") REFERENCES "subjects"("subject_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "task_types" ADD CONSTRAINT "task_types_subject_id_fkey" FOREIGN KEY ("subject_id") REFERENCES "subjects"("subject_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "tasks" ADD CONSTRAINT "tasks_task_type_id_fkey" FOREIGN KEY ("task_type_id") REFERENCES "task_types"("task_type_id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -14,32 +14,30 @@ datasource db {
 }
 
 model Phone {
-  phoneId     String     @id @default(uuid()) @map("phone_id")
-  phoneNumber String     @unique @map("phone_number")
-  createdAt   DateTime   @default(now()) @map("created_at")
-  updatedAt   DateTime   @updatedAt @map("updated_at")
+  phoneId     String    @id @default(uuid()) @map("phone_id")
+  phoneNumber String    @unique @map("phone_number")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
   subjects    Subject[]
-  taskTypes   TaskType[]
 
   @@map("phones")
 }
 
 model Subject {
-  subjectId   String   @id @default(uuid()) @map("subject_id")
-  phoneNumber Phone    @relation(fields: [phoneId], references: [phoneId])
-  phoneId     String   @map("phone_id")
-  title       String
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  tasks       Task[]
+  subjectId   String     @id @default(uuid()) @map("subject_id")
+  phoneNumber Phone      @relation(fields: [phoneId], references: [phoneId])
+  phoneId     String     @map("phone_id")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+  taskTypes   TaskType[]
 
   @@map("subjects")
 }
 
 model TaskType {
   taskTypeId String   @id @default(uuid()) @map("task_type_id")
-  phone      Phone    @relation(fields: [phoneId], references: [phoneId])
-  phoneId    String   @map("phone_id")
+  subject    Subject  @relation(fields: [subjectId], references: [subjectId], onDelete: Cascade)
+  subjectId  String   @map("subject_id")
   title      String
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
@@ -50,8 +48,6 @@ model TaskType {
 
 model Task {
   taskId      String    @id @default(uuid()) @map("task_id")
-  subject     Subject   @relation(fields: [subjectId], references: [subjectId], onDelete: Cascade)
-  subjectId   String    @map("subject_id")
   taskType    TaskType  @relation(fields: [taskTypeId], references: [taskTypeId], onDelete: Cascade)
   taskTypeId  String    @map("task_type_id")
   title       String
