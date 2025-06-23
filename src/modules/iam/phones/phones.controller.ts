@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { Phone } from '@prisma/client';
-import { PhonesService } from './phones.service';
+import { AccessTokenGuard } from '../jwt-token/guards/access-token.guard';
 import { CreatePhoneDto } from './dto/create-phone.dto';
 import { UpdatePhoneDto } from './dto/update-phone.dto';
-import { AccessTokenGuard } from '../auth/guards/access-token.guard';
+import { PhonesService } from './phones.service';
 
 @Controller('phones')
 export class PhonesController {

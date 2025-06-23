@@ -1,10 +1,10 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Phone } from '@prisma/client';
-import { PhonesController } from './phones.controller';
-import { PhonesService } from './phones.service';
 import { CreatePhoneDto } from './dto/create-phone.dto';
 import { UpdatePhoneDto } from './dto/update-phone.dto';
+import { PhonesController } from './phones.controller';
+import { PhonesService } from './phones.service';
 
 const phoneId = '68cc942b-41c7-4c93-b214-d4f26b4577ee';
 const phoneNumber = '79000000000';

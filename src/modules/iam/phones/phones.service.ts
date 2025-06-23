@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Phone } from '@prisma/client';
+import { PrismaService } from '../../../common/prisma/prisma.service';
 import { CreatePhoneDto } from './dto/create-phone.dto';
 import { UpdatePhoneDto } from './dto/update-phone.dto';
-import { PrismaService } from '../../../common/prisma/prisma.service';
 
 @Injectable()
 export class PhonesService {
@@ -36,14 +36,10 @@ export class PhonesService {
     return phone;
   }
 
-  async findByPhoneNumber(phoneNumber: string): Promise<Phone> {
+  async findByPhoneNumber(phoneNumber: string): Promise<Phone | null> {
     const phone = await this.prismaService.phone.findUnique({
       where: { phoneNumber },
     });
-
-    if (!phone) {
-      throw new NotFoundException('Phone number is not found');
-    }
 
     return phone;
   }
