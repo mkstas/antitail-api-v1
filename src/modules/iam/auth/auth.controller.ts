@@ -1,13 +1,16 @@
 import { Body, Controller, Delete, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
+import { AccessTokenGuard } from '../jwt-token/guards/access-token.guard';
+import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto.';
-import { setJwtCookie } from 'src/common/utils/jwt-cookies';
-import { AccessTokenGuard } from './guards/access-token.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly jwtTokenService: JwtTokenService,
+  ) {}
 
   @Post('login')
   async login(
@@ -15,7 +18,13 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
     const accessToken = await this.authService.login(loginDto);
-    setJwtCookie(res, 'accessToken', accessToken, 1000 * 60 * 60 * 24 * 90);
+
+    this.jwtTokenService.setCookieWithToken(
+      res,
+      'accessToken',
+      accessToken,
+      1000 * 60 * 60 * 24 * 90,
+    );
   }
 
   @Delete('logout')

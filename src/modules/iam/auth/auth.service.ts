@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import { PhonesService } from '../phones/phones.service';
 import { LoginDto } from './dto/login.dto.';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly jwtService: JwtService,
     private readonly phonesService: PhonesService,
+    private readonly jwtTokenService: JwtTokenService,
   ) {}
 
   async login(loginDto: LoginDto): Promise<string> {
@@ -17,15 +17,6 @@ export class AuthService {
       candidate = await this.phonesService.create(loginDto);
     }
 
-    return await this.generateAccessToken(candidate.phoneId);
-  }
-
-  private async generateAccessToken(sub: string): Promise<string> {
-    const accessToken = await this.jwtService.signAsync(
-      { sub },
-      { secret: process.env.JWT_ACCESS_SECRET, expiresIn: '90d' },
-    );
-
-    return accessToken;
+    return await this.jwtTokenService.generateAccessToken(candidate.phoneId);
   }
 }
