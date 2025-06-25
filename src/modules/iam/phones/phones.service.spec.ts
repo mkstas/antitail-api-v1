@@ -84,11 +84,11 @@ describe('PhonesService', () => {
       await expect(service.findById(phoneId)).resolves.toEqual(phone);
     });
 
-    it('should throw an exception if phone is not found', async () => {
+    it('should throw an exception if phone does not exist', async () => {
       mockPrisma.phone.findUnique.mockResolvedValue(null);
 
       await expect(service.findById(phoneId)).rejects.toThrow(
-        new NotFoundException('Phone number is not found'),
+        new NotFoundException('Phone number does not exist'),
       );
     });
   });
@@ -100,7 +100,7 @@ describe('PhonesService', () => {
       await expect(service.findByPhoneNumber(phoneNumber)).resolves.toEqual(phone);
     });
 
-    it('should throw an exception if phone is not found', async () => {
+    it('should throw an exception if phone does not exist', async () => {
       mockPrisma.phone.findUnique.mockResolvedValue(null);
 
       await expect(service.findByPhoneNumber(phoneNumber)).resolves.toBe(null);
@@ -115,11 +115,11 @@ describe('PhonesService', () => {
       await expect(service.update(phoneId, updatePhoneDto)).resolves.toEqual(updatedPhone);
     });
 
-    it('should throw an exception if phone is not found for update', async () => {
+    it('should throw an exception if phone to update does not exist', async () => {
       mockPrisma.phone.findUnique.mockResolvedValue(null);
 
       await expect(service.update(phoneId, updatePhoneDto)).rejects.toThrow(
-        new NotFoundException('Phone number is not found'),
+        new NotFoundException('Phone number does not exist'),
       );
     });
   });
@@ -132,11 +132,11 @@ describe('PhonesService', () => {
       await expect(service.remove(phoneId)).resolves.toEqual(updatedPhone);
     });
 
-    it('should throw an exception if phone is not found for remove', async () => {
+    it('should throw an exception if phone to remove does not exist', async () => {
       mockPrisma.phone.findUnique.mockResolvedValue(null);
 
       await expect(service.remove(phoneId)).rejects.toThrow(
-        new NotFoundException('Phone number is not found'),
+        new NotFoundException('Phone number does not exist'),
       );
     });
   });

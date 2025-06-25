@@ -83,13 +83,13 @@ describe('Phones Controller', () => {
       await expect(controller.findById(phoneId)).resolves.toEqual(phone);
     });
 
-    it('should throw an exception from service if phone is not found', async () => {
+    it('should throw an exception from service if phone does not exist', async () => {
       jest
         .spyOn(service, 'findById')
-        .mockRejectedValue(new NotFoundException('Phone number is not found'));
+        .mockRejectedValue(new NotFoundException('Phone number does not exist'));
 
       await expect(controller.findById(phoneId)).rejects.toThrow(
-        new NotFoundException('Phone number is not found'),
+        new NotFoundException('Phone number does not exist'),
       );
     });
   });
@@ -101,13 +101,13 @@ describe('Phones Controller', () => {
       await expect(controller.update(phoneId, updatePhoneDto)).resolves.toEqual(updatedPhone);
     });
 
-    it('should throw an exception from service if phone is not found for update', async () => {
+    it('should throw an exception from service if phone to update does not exist', async () => {
       jest
         .spyOn(service, 'update')
-        .mockRejectedValue(new NotFoundException('Phone number is not found'));
+        .mockRejectedValue(new NotFoundException('Phone number does not exist'));
 
       await expect(controller.update(phoneId, updatePhoneDto)).rejects.toThrow(
-        new NotFoundException('Phone number is not found'),
+        new NotFoundException('Phone number does not exist'),
       );
     });
   });
@@ -119,13 +119,13 @@ describe('Phones Controller', () => {
       await expect(controller.remove(phoneId)).resolves.toEqual(phone);
     });
 
-    it('should throw an exception from service if phone is not found for remove', async () => {
+    it('should throw an exception from service if phone to remove does not exist', async () => {
       jest
         .spyOn(service, 'remove')
-        .mockRejectedValue(new NotFoundException('Phone number is not found'));
+        .mockRejectedValue(new NotFoundException('Phone number does not exist'));
 
       await expect(controller.remove(phoneId)).rejects.toThrow(
-        new NotFoundException('Phone number is not found'),
+        new NotFoundException('Phone number does not exist'),
       );
     });
   });

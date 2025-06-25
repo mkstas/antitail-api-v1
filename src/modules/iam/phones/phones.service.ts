@@ -30,7 +30,7 @@ export class PhonesService {
     });
 
     if (!phone) {
-      throw new NotFoundException('Phone number is not found');
+      throw new NotFoundException('Phone number does not exist');
     }
 
     return phone;
