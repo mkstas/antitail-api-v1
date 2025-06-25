@@ -24,12 +24,13 @@ model Phone {
 }
 
 model Subject {
-  subjectId   String     @id @default(uuid()) @map("subject_id")
-  phoneNumber Phone      @relation(fields: [phoneId], references: [phoneId])
-  phoneId     String     @map("phone_id")
-  createdAt   DateTime   @default(now()) @map("created_at")
-  updatedAt   DateTime   @updatedAt @map("updated_at")
-  taskTypes   TaskType[]
+  subjectId String     @id @default(uuid()) @map("subject_id")
+  phone     Phone      @relation(fields: [phoneId], references: [phoneId])
+  phoneId   String     @map("phone_id")
+  title     String     @unique
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  taskTypes TaskType[]
 
   @@map("subjects")
 }

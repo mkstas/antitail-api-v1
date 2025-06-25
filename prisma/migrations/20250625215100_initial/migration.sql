@@ -12,6 +12,7 @@ CREATE TABLE "phones" (
 CREATE TABLE "subjects" (
     "subject_id" TEXT NOT NULL,
     "phone_id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -57,6 +58,9 @@ CREATE TABLE "subtasks" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "phones_phone_number_key" ON "phones"("phone_number");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "subjects_title_key" ON "subjects"("title");
 
 -- AddForeignKey
 ALTER TABLE "subjects" ADD CONSTRAINT "subjects_phone_id_fkey" FOREIGN KEY ("phone_id") REFERENCES "phones"("phone_id") ON DELETE RESTRICT ON UPDATE CASCADE;
