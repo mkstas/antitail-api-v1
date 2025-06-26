@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Subject } from '@prisma/client';
-import { SubjectsService } from './subjects.service';
-import { CreateSubjectDto } from './dto/create-subject.dto';
-import { UpdateSubjectDto } from './dto/update-subject.dto';
 import { JwtPayload, JwtRequest } from 'src/common/utils/jwt-cookies';
 import { AccessTokenGuard } from '../iam/auth/guards/access-token.guard';
+import { CreateSubjectDto } from './dto/create-subject.dto';
+import { UpdateSubjectDto } from './dto/update-subject.dto';
+import { SubjectsService } from './subjects.service';
 
 @Controller('subjects')
 export class SubjectsController {

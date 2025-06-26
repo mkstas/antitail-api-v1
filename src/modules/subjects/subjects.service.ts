@@ -1,19 +1,27 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Subject } from '@prisma/client';
+import { PrismaService } from '../../common/prisma/prisma.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
-import { PrismaService } from 'src/common/prisma/prisma.service';
 
 @Injectable()
 export class SubjectsService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(phoneId: string, createSubjectDto: CreateSubjectDto): Promise<Subject> {
-    const subject = await this.prismaService.subject.create({
+    const subject = await this.prismaService.subject.findUnique({
+      where: { title: createSubjectDto.title },
+    });
+
+    if (subject) {
+      throw new BadRequestException('Subject is already exists');
+    }
+
+    const newSubject = await this.prismaService.subject.create({
       data: { phoneId, ...createSubjectDto },
     });
 
-    return subject;
+    return newSubject;
   }
 
   async findAll(phoneId: string): Promise<Subject[]> {
@@ -21,14 +29,14 @@ export class SubjectsService {
       where: { phoneId },
     });
 
-    if (!subjects.length) {
+    if (!subjects) {
       throw new NotFoundException('Subjects are not found');
     }
 
     return subjects;
   }
 
-  async findOne(id: string): Promise<Subject> {
+  async findById(id: string): Promise<Subject> {
     const subject = await this.prismaService.subject.findUnique({
       where: { subjectId: id },
     });
@@ -41,9 +49,10 @@ export class SubjectsService {
   }
 
   async update(id: string, updateSubjectDto: UpdateSubjectDto): Promise<Subject> {
-    const { subjectId } = await this.findOne(id);
+    const subject = await this.findById(id);
+
     const updatedSubject = await this.prismaService.subject.update({
-      where: { subjectId },
+      where: { subjectId: subject.subjectId },
       data: { ...updateSubjectDto },
     });
 
@@ -51,9 +60,10 @@ export class SubjectsService {
   }
 
   async remove(id: string): Promise<Subject> {
-    const { subjectId } = await this.findOne(id);
+    const subject = await this.findById(id);
+
     const removedSubject = await this.prismaService.subject.delete({
-      where: { subjectId },
+      where: { subjectId: subject.subjectId },
     });
 
     return removedSubject;

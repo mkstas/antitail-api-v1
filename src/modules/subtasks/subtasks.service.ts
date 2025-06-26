@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Subtask } from '@prisma/client';
+import { PrismaService } from 'src/common/prisma/prisma.service';
 import { CreateSubtaskDto } from './dto/create-subtask.dto';
 import { UpdateSubtaskDto } from './dto/update-subtask.dto';
-import { PrismaService } from 'src/common/prisma/prisma.service';
 
 @Injectable()
 export class SubtasksService {

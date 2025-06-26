@@ -1,22 +1,22 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  UseGuards,
+  Get,
+  Param,
+  Patch,
+  Post,
   Query,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Task } from '@prisma/client';
-import { TasksService } from './tasks.service';
+import { JwtPayload, JwtRequest } from 'src/common/utils/jwt-cookies';
+import { AccessTokenGuard } from '../iam/auth/guards/access-token.guard';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { AccessTokenGuard } from '../iam/auth/guards/access-token.guard';
-import { JwtPayload, JwtRequest } from 'src/common/utils/jwt-cookies';
+import { TasksService } from './tasks.service';
 
 @Controller('tasks')
 export class TasksController {

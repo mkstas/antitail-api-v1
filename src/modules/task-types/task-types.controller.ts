@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { TaskType } from '@prisma/client';
-import { TaskTypesService } from './task-types.service';
+import { JwtPayload, JwtRequest } from 'src/common/utils/jwt-cookies';
+import { AccessTokenGuard } from '../iam/auth/guards/access-token.guard';
 import { CreateTaskTypeDto } from './dto/create-task-type.dto';
 import { UpdateTaskTypeDto } from './dto/update-task-type.dto';
-import { JwtRequest, JwtPayload } from 'src/common/utils/jwt-cookies';
-import { AccessTokenGuard } from '../iam/auth/guards/access-token.guard';
+import { TaskTypesService } from './task-types.service';
 
 @Controller('task-types')
 export class TaskTypesController {
