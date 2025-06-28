@@ -30,7 +30,7 @@ const updatedPhone: Phone = {
   phoneNumber: updatedPhoneNumber,
 };
 
-describe('Phones Controller', () => {
+describe('PhonesController', () => {
   let controller: PhonesController;
   let service: PhonesService;
 
