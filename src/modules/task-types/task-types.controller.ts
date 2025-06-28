@@ -1,37 +1,40 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { TaskType } from '@prisma/client';
-import { JwtPayload, JwtRequest } from 'src/common/utils/jwt-cookies';
-import { AccessTokenGuard } from '../iam/auth/guards/access-token.guard';
+import { AccessTokenGuard } from '../iam/jwt-token/guards/access-token.guard';
 import { CreateTaskTypeDto } from './dto/create-task-type.dto';
 import { UpdateTaskTypeDto } from './dto/update-task-type.dto';
 import { TaskTypesService } from './task-types.service';
 
 @Controller('task-types')
 export class TaskTypesController {
-  constructor(
-    private readonly jwtService: JwtService,
-    private readonly taskTypesService: TaskTypesService,
-  ) {}
+  constructor(private readonly taskTypesService: TaskTypesService) {}
 
   @Post()
   @UseGuards(AccessTokenGuard)
-  create(@Req() req: JwtRequest, @Body() createTaskTypeDto: CreateTaskTypeDto): Promise<TaskType> {
-    const { sub: phoneId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    return this.taskTypesService.create(phoneId, createTaskTypeDto);
+  create(@Body() createTaskTypeDto: CreateTaskTypeDto): Promise<TaskType> {
+    return this.taskTypesService.create(createTaskTypeDto);
   }
 
   @Get()
   @UseGuards(AccessTokenGuard)
-  findAll(@Req() req: JwtRequest): Promise<TaskType[]> {
-    const { sub: phoneId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    return this.taskTypesService.findAll(phoneId);
+  findAll(@Query('subjectId') subjectId: string): Promise<TaskType[]> {
+    return this.taskTypesService.findAll(subjectId);
   }
 
   @Get(':id')
   @UseGuards(AccessTokenGuard)
   findOne(@Param('id') id: string): Promise<TaskType> {
-    return this.taskTypesService.findOne(id);
+    return this.taskTypesService.findById(id);
   }
 
   @Patch(':id')

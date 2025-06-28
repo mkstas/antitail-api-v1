@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { TaskType } from '@prisma/client';
-import { PrismaService } from 'src/common/prisma/prisma.service';
+import { PrismaService } from '../../common/prisma/prisma.service';
 import { CreateTaskTypeDto } from './dto/create-task-type.dto';
 import { UpdateTaskTypeDto } from './dto/update-task-type.dto';
 
@@ -8,27 +8,35 @@ import { UpdateTaskTypeDto } from './dto/update-task-type.dto';
 export class TaskTypesService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(phoneId: string, createTaskTypeDto: CreateTaskTypeDto): Promise<TaskType> {
-    const taskType = await this.prismaService.taskType.create({
-      data: { phoneId, ...createTaskTypeDto },
+  async create(createTaskTypeDto: CreateTaskTypeDto): Promise<TaskType> {
+    const taskType = await this.prismaService.taskType.findUnique({
+      where: { title: createTaskTypeDto.title },
     });
 
-    return taskType;
+    if (taskType) {
+      throw new BadRequestException('Task type is already exists');
+    }
+
+    const newTaskType = await this.prismaService.taskType.create({
+      data: { ...createTaskTypeDto },
+    });
+
+    return newTaskType;
   }
 
-  async findAll(phoneId: string): Promise<TaskType[]> {
+  async findAll(subjectId: string): Promise<TaskType[]> {
     const taskTypes = await this.prismaService.taskType.findMany({
-      where: { phoneId },
+      where: { subjectId },
     });
 
-    if (!taskTypes.length) {
+    if (!taskTypes) {
       throw new NotFoundException('Task types are not found');
     }
 
     return taskTypes;
   }
 
-  async findOne(id: string): Promise<TaskType> {
+  async findById(id: string): Promise<TaskType> {
     const taskType = await this.prismaService.taskType.findUnique({
       where: { taskTypeId: id },
     });
@@ -41,9 +49,10 @@ export class TaskTypesService {
   }
 
   async update(id: string, updateTaskTypeDto: UpdateTaskTypeDto): Promise<TaskType> {
-    const { taskTypeId } = await this.findOne(id);
+    const taskType = await this.findById(id);
+
     const updatedTaskType = await this.prismaService.taskType.update({
-      where: { taskTypeId },
+      where: { taskTypeId: taskType.taskTypeId },
       data: { ...updateTaskTypeDto },
     });
 
@@ -51,9 +60,10 @@ export class TaskTypesService {
   }
 
   async remove(id: string): Promise<TaskType> {
-    const { taskTypeId } = await this.findOne(id);
+    const taskType = await this.findById(id);
+
     const removedTaskType = await this.prismaService.taskType.delete({
-      where: { taskTypeId },
+      where: { taskTypeId: taskType.taskTypeId },
     });
 
     return removedTaskType;
