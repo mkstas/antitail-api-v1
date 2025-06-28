@@ -9,14 +9,14 @@ import { SubjectsService } from './subjects.service';
 const phoneId = '68cc942b-41c7-4c93-b214-d4f26b4577ee';
 const subjectId = '68cc942b-41c7-4c93-b214-d4f26b4577ee';
 const title = 'Программирование';
-const updatedTitle = 'Программирование';
+const updatedTitle = 'Информатика';
 
 const createSubjectDto: CreateSubjectDto = {
-  title: 'Программирование',
+  title,
 };
 
 const updateSubjectDto: UpdateSubjectDto = {
-  title: 'Информатика',
+  title: updatedTitle,
 };
 
 const subject: Subject = {
