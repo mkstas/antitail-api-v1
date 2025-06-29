@@ -1,4 +1,4 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Subject } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
@@ -69,14 +69,6 @@ describe('SubjectsService', () => {
       mockPrisma.subject.create.mockResolvedValue(subject);
 
       await expect(service.create(phoneId, createSubjectDto)).resolves.toEqual(subject);
-    });
-
-    it('should throw an exception if subject is already exists', async () => {
-      mockPrisma.subject.findUnique.mockResolvedValue(subject);
-
-      await expect(service.create(phoneId, createSubjectDto)).rejects.toThrow(
-        new BadRequestException('Subject is already exists'),
-      );
     });
   });
 

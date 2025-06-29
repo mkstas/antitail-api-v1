@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { TaskType } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { CreateTaskTypeDto } from './dto/create-task-type.dto';
@@ -9,14 +9,6 @@ export class TaskTypesService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createTaskTypeDto: CreateTaskTypeDto): Promise<TaskType> {
-    const taskType = await this.prismaService.taskType.findUnique({
-      where: { title: createTaskTypeDto.title },
-    });
-
-    if (taskType) {
-      throw new BadRequestException('Task type is already exists');
-    }
-
     const newTaskType = await this.prismaService.taskType.create({
       data: { ...createTaskTypeDto },
     });

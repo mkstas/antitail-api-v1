@@ -27,7 +27,7 @@ model Subject {
   subjectId String     @id @default(uuid()) @map("subject_id")
   phone     Phone      @relation(fields: [phoneId], references: [phoneId])
   phoneId   String     @map("phone_id")
-  title     String     @unique
+  title     String
   createdAt DateTime   @default(now()) @map("created_at")
   updatedAt DateTime   @updatedAt @map("updated_at")
   taskTypes TaskType[]
@@ -39,7 +39,7 @@ model TaskType {
   taskTypeId String   @id @default(uuid()) @map("task_type_id")
   subject    Subject  @relation(fields: [subjectId], references: [subjectId], onDelete: Cascade)
   subjectId  String   @map("subject_id")
-  title      String   @unique
+  title      String
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
   tasks      Task[]
@@ -51,7 +51,7 @@ model Task {
   taskId      String    @id @default(uuid()) @map("task_id")
   taskType    TaskType  @relation(fields: [taskTypeId], references: [taskTypeId], onDelete: Cascade)
   taskTypeId  String    @map("task_type_id")
-  title       String    @unique
+  title       String
   description String?
   deadline    DateTime
   isDone      Boolean   @default(false) @map("is_done")

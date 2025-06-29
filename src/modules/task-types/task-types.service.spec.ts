@@ -1,4 +1,4 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TaskType } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
@@ -70,14 +70,6 @@ describe('TaskTypesService', () => {
       mockPrisma.taskType.create.mockResolvedValue(taskType);
 
       await expect(service.create(createTaskTypeDto)).resolves.toEqual(taskType);
-    });
-
-    it('should throw an exception if task type is already exists', async () => {
-      mockPrisma.taskType.findUnique.mockResolvedValue(taskType);
-
-      await expect(service.create(createTaskTypeDto)).rejects.toThrow(
-        new BadRequestException('Task type is already exists'),
-      );
     });
   });
 

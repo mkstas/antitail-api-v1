@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Subject } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
@@ -9,14 +9,6 @@ export class SubjectsService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(phoneId: string, createSubjectDto: CreateSubjectDto): Promise<Subject> {
-    const subject = await this.prismaService.subject.findUnique({
-      where: { title: createSubjectDto.title },
-    });
-
-    if (subject) {
-      throw new BadRequestException('Subject is already exists');
-    }
-
     const newSubject = await this.prismaService.subject.create({
       data: { phoneId, ...createSubjectDto },
     });
