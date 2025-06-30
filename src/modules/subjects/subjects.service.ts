@@ -21,7 +21,7 @@ export class SubjectsService {
       where: { phoneId },
     });
 
-    if (!subjects) {
+    if (!subjects.length) {
       throw new NotFoundException('Subjects are not found');
     }
 

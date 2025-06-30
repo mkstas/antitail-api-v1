@@ -21,7 +21,7 @@ export class TaskTypesService {
       where: { subjectId },
     });
 
-    if (!taskTypes) {
+    if (!taskTypes.length) {
       throw new NotFoundException('Task types are not found');
     }
 

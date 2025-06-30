@@ -22,14 +22,14 @@ export class SubtasksService {
       orderBy: { isDone: 'asc' },
     });
 
-    if (!subtasks.length) {
+    if (!subtasks) {
       throw new NotFoundException('Subtasks are not found');
     }
 
     return subtasks;
   }
 
-  async findOne(id: string): Promise<Subtask> {
+  async findById(id: string): Promise<Subtask> {
     const subtask = await this.prismaService.subtask.findUnique({
       where: { subtaskId: id },
     });
@@ -42,9 +42,10 @@ export class SubtasksService {
   }
 
   async update(id: string, updateSubtaskDto: UpdateSubtaskDto): Promise<Subtask> {
-    const { subtaskId } = await this.findOne(id);
+    const subtask = await this.findById(id);
+
     const updatedSubtask = await this.prismaService.subtask.update({
-      where: { subtaskId },
+      where: { subtaskId: subtask.subtaskId },
       data: { ...updateSubtaskDto },
     });
 
@@ -52,9 +53,10 @@ export class SubtasksService {
   }
 
   async remove(id: string): Promise<Subtask> {
-    const { subtaskId } = await this.findOne(id);
+    const subtask = await this.findById(id);
+
     const removedSubtask = await this.prismaService.subtask.delete({
-      where: { subtaskId },
+      where: { subtaskId: subtask.subtaskId },
     });
 
     return removedSubtask;

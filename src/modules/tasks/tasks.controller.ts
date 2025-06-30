@@ -7,23 +7,17 @@ import {
   Patch,
   Post,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Task } from '@prisma/client';
-import { JwtPayload, JwtRequest } from 'src/common/utils/jwt-cookies';
-import { AccessTokenGuard } from '../iam/auth/guards/access-token.guard';
+import { AccessTokenGuard } from '../iam/jwt-token/guards/access-token.guard';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TasksService } from './tasks.service';
 
 @Controller('tasks')
 export class TasksController {
-  constructor(
-    private readonly jwtService: JwtService,
-    private readonly tasksService: TasksService,
-  ) {}
+  constructor(private readonly tasksService: TasksService) {}
 
   @Post()
   @UseGuards(AccessTokenGuard)
@@ -33,21 +27,14 @@ export class TasksController {
 
   @Get()
   @UseGuards(AccessTokenGuard)
-  findAll(
-    @Req() req: JwtRequest,
-    @Query('subjectId') subjectId: string,
-    @Query('taskTypeId') taskTypeId: string,
-  ) {
-    const { sub: phoneId } = this.jwtService.decode<JwtPayload>(req.cookies.accessToken);
-    const subjects = subjectId?.split(',');
-    const taskTypes = taskTypeId?.split(',');
-    return this.tasksService.findAll(phoneId, subjects, taskTypes);
+  findAll(@Query('taskTypeId') taskTypeId: string) {
+    return this.tasksService.findAll(taskTypeId);
   }
 
   @Get(':id')
   @UseGuards(AccessTokenGuard)
-  findOne(@Param('id') id: string): Promise<Task> {
-    return this.tasksService.findOne(id);
+  findById(@Param('id') id: string): Promise<Task> {
+    return this.tasksService.findById(id);
   }
 
   @Patch(':id')

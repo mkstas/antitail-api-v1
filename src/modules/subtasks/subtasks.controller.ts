@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Subtask } from '@prisma/client';
-import { AccessTokenGuard } from '../iam/auth/guards/access-token.guard';
+import { AccessTokenGuard } from '../iam/jwt-token/guards/access-token.guard';
 import { CreateSubtaskDto } from './dto/create-subtask.dto';
 import { UpdateSubtaskDto } from './dto/update-subtask.dto';
 import { SubtasksService } from './subtasks.service';
@@ -33,8 +33,8 @@ export class SubtasksController {
 
   @Get(':id')
   @UseGuards(AccessTokenGuard)
-  findOne(@Param('id') id: string): Promise<Subtask> {
-    return this.subtasksService.findOne(id);
+  findById(@Param('id') id: string): Promise<Subtask> {
+    return this.subtasksService.findById(id);
   }
 
   @Patch(':id')

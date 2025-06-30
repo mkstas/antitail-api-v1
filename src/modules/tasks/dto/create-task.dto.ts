@@ -1,11 +1,7 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsNotEmpty, IsString } from 'class-validator';
+import { IsDate, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateTaskDto {
-  @IsString()
-  @IsNotEmpty()
-  readonly subjectId: string;
-
   @IsString()
   @IsNotEmpty()
   readonly taskTypeId: string;
@@ -15,9 +11,11 @@ export class CreateTaskDto {
   readonly title: string;
 
   @IsString()
+  @IsOptional()
   readonly description: string;
 
   @IsDate()
   @Type(() => Date)
+  @IsNotEmpty()
   readonly deadline: Date;
 }
