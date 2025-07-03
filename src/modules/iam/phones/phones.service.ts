@@ -18,7 +18,7 @@ export class PhonesService {
     }
 
     const newPhone = await this.prismaService.phone.create({
-      data: { phoneNumber: createPhoneDto.phoneNumber },
+      data: { ...createPhoneDto },
     });
 
     return newPhone;
@@ -30,7 +30,7 @@ export class PhonesService {
     });
 
     if (!phone) {
-      throw new NotFoundException('Phone number does not exist');
+      throw new NotFoundException('Phone number is not found');
     }
 
     return phone;
@@ -49,19 +49,9 @@ export class PhonesService {
 
     const updatedPhone = await this.prismaService.phone.update({
       where: { phoneId: phone.phoneId },
-      data: { phoneNumber: updatePhoneDto.phoneNumber },
+      data: { ...updatePhoneDto },
     });
 
     return updatedPhone;
-  }
-
-  async remove(id: string): Promise<Phone> {
-    const phone = await this.findById(id);
-
-    const removedPhone = await this.prismaService.phone.delete({
-      where: { phoneId: phone.phoneId },
-    });
-
-    return removedPhone;
   }
 }

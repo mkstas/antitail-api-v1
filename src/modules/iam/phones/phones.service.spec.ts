@@ -6,28 +6,24 @@ import { CreatePhoneDto } from './dto/create-phone.dto';
 import { UpdatePhoneDto } from './dto/update-phone.dto';
 import { PhonesService } from './phones.service';
 
-const phoneId = '68cc942b-41c7-4c93-b214-d4f26b4577ee';
-const phoneNumber = '79000000000';
-const updatedPhoneNumber = '79000000001';
-
-const createPhoneDto: CreatePhoneDto = {
-  phoneNumber,
-};
-
-const updatePhoneDto: UpdatePhoneDto = {
-  phoneNumber: updatedPhoneNumber,
-};
-
 const phone: Phone = {
-  phoneId,
-  phoneNumber,
+  phoneId: '7be45b78-45b2-4bed-8b70-26774f996cbe',
+  phoneNumber: '79000000000',
   createdAt: new Date(),
   updatedAt: new Date(),
 };
 
 const updatedPhone: Phone = {
   ...phone,
-  phoneNumber: updatedPhoneNumber,
+  phoneNumber: '79000000001',
+};
+
+const createPhoneDto: CreatePhoneDto = {
+  phoneNumber: phone.phoneNumber,
+};
+
+const updatePhoneDto: UpdatePhoneDto = {
+  phoneNumber: updatedPhone.phoneNumber,
 };
 
 const mockPrisma = {
@@ -35,7 +31,6 @@ const mockPrisma = {
     create: jest.fn(),
     findUnique: jest.fn(),
     update: jest.fn(),
-    delete: jest.fn(),
   },
 };
 
@@ -81,14 +76,14 @@ describe('PhonesService', () => {
     it('should return a phone by id', async () => {
       mockPrisma.phone.findUnique.mockResolvedValue(phone);
 
-      await expect(service.findById(phoneId)).resolves.toEqual(phone);
+      await expect(service.findById(phone.phoneId)).resolves.toEqual(phone);
     });
 
-    it('should throw an exception if phone does not exist', async () => {
+    it('should throw an exception if phone is not found', async () => {
       mockPrisma.phone.findUnique.mockResolvedValue(null);
 
-      await expect(service.findById(phoneId)).rejects.toThrow(
-        new NotFoundException('Phone number does not exist'),
+      await expect(service.findById(phone.phoneId)).rejects.toThrow(
+        new NotFoundException('Phone number is not found'),
       );
     });
   });
@@ -97,13 +92,13 @@ describe('PhonesService', () => {
     it('should return a phone by phone number', async () => {
       mockPrisma.phone.findUnique.mockResolvedValue(phone);
 
-      await expect(service.findByPhoneNumber(phoneNumber)).resolves.toEqual(phone);
+      await expect(service.findByPhoneNumber(phone.phoneNumber)).resolves.toEqual(phone);
     });
 
-    it('should throw an exception if phone does not exist', async () => {
+    it('should throw an exception if phone is not found', async () => {
       mockPrisma.phone.findUnique.mockResolvedValue(null);
 
-      await expect(service.findByPhoneNumber(phoneNumber)).resolves.toBe(null);
+      await expect(service.findByPhoneNumber(phone.phoneNumber)).resolves.toBe(null);
     });
   });
 
@@ -112,31 +107,14 @@ describe('PhonesService', () => {
       mockPrisma.phone.findUnique.mockResolvedValue(phone);
       mockPrisma.phone.update.mockResolvedValue(updatedPhone);
 
-      await expect(service.update(phoneId, updatePhoneDto)).resolves.toEqual(updatedPhone);
+      await expect(service.update(phone.phoneId, updatePhoneDto)).resolves.toEqual(updatedPhone);
     });
 
-    it('should throw an exception if phone to update does not exist', async () => {
+    it('should throw an exception if phone to update is not found', async () => {
       mockPrisma.phone.findUnique.mockResolvedValue(null);
 
-      await expect(service.update(phoneId, updatePhoneDto)).rejects.toThrow(
-        new NotFoundException('Phone number does not exist'),
-      );
-    });
-  });
-
-  describe('remove', () => {
-    it('should return a removed phone', async () => {
-      mockPrisma.phone.findUnique.mockResolvedValue(phone);
-      mockPrisma.phone.delete.mockResolvedValue(updatedPhone);
-
-      await expect(service.remove(phoneId)).resolves.toEqual(updatedPhone);
-    });
-
-    it('should throw an exception if phone to remove does not exist', async () => {
-      mockPrisma.phone.findUnique.mockResolvedValue(null);
-
-      await expect(service.remove(phoneId)).rejects.toThrow(
-        new NotFoundException('Phone number does not exist'),
+      await expect(service.update(phone.phoneId, updatePhoneDto)).rejects.toThrow(
+        new NotFoundException('Phone number is not found'),
       );
     });
   });

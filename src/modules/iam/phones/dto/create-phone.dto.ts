@@ -1,6 +1,6 @@
 import { IsPhoneNumber } from 'class-validator';
 
 export class CreatePhoneDto {
-  @IsPhoneNumber('RU')
-  readonly phoneNumber: string;
+  @IsPhoneNumber('RU', { message: 'invalid phone number format' })
+  phoneNumber: string;
 }
