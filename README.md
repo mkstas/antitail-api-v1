@@ -1,4 +1,4 @@
-# Проект АнтиХвост (серверное приложение)
+# Проект HVOSTOV.net (серверное приложение)
 
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)
@@ -9,7 +9,7 @@
 
 ## Описание 📖
 
-Репозиторий содержит серверное приложение на основе [NestJS](https://nestjs.com/), представляющее из себя REST API для клиентского приложения [nextjs-anti-tail](https://github.com/mkstas/nextjs-anti-tail).
+Репозиторий содержит серверное приложение на основе [NestJS](https://nestjs.com/), представляющее из себя REST API для клиентского приложения [hvostov.net-web-app](https://github.com/mkstas/hvostov.net-web-app).
 
 ## Функционал ✨
 
